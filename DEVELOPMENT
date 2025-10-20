@@ -1,0 +1,28 @@
+- Quy ước đặt tên
+  + Tên class chuẩn PascalCase (ví dụ UserModel, CustomRepository)
+  + Tên biến thì chuẩn camelCase (ví dụ myVariable, productName)
+  + Nếu đặt tên cho cột sử dụng trong database thì dùng snake_case (ví dụ user_id, product_name)
+  + Các hằng số (constant) viết hoa toàn bộ, các từ ngăn cách nhau bởi dấu gạch dưới (ví dụ MAX_SIZE, DEFAULT_TIMEOUT)
+
+- Cấu trúc thư mục
+  + Tất cả các file Java sẽ được đặt trong thư mục src/main/java/com/github/rinnn31/shoppydex/
+  + Các file tài nguyên như cấu hình, tệp tĩnh sẽ nằm trong src/main/resources/
+
+- Sử dụng git và github
+  + Clone repository: git clone https://github.com/rinnn31/shoppydex.git
+  + Tạo nhánh mới cho mỗi tính năng hoặc sửa lỗi: git checkout -b feature/quanlysanpham
+  + Thêm các tính năng, sau đó:
+    * git add .
+    * git commit -m "Mô tả ngắn gọn về thay đổi"
+    * git push origin feature/ten-tinh-nang
+  + Lên GitHub tạo Pull Request để hợp nhất các thay đổi vào nhánh chính.
+  + Lưu ý: Luôn đồng bộ nhánh chính trước khi tạo nhánh mới hoặc hợp nhất thay đổi.
+    * git checkout main // Chuyển sang nhánh chính
+    * git pull origin main // Cập nhật nhánh chính với các thay đổi mới nhất
+    * git checkout feature/ten-tinh-nang // Quay lại nhánh tính năng
+    * git merge/rebase main // Hợp nhất các thay đổi từ nhánh chính vào nhánh tính năng
+ 
+  + Tham khảo thêm về quy tắc viết commit tại: https://viblo.asia/p/cac-quy-tac-viet-noi-dung-commit-07LKX2b4lV4
+
+
+
