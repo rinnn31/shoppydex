@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShoppyDex - Đăng nhập</title>
+    <link rel="stylesheet" href="/css/login_style.css">
+</head>
+<body>
+    <div class="logo">
+        <div class="logo-icon"></div>
+        <span>InsideBox</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Đăng nhập</h1>
+        </div>
+
+        <form>
+            <div class="form-group">
+                <label for="email">Email/Username</label>
+                <input type="text" placeholder="Nhập ịa chỉ email hoặc username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <input type="password" placeholder="Nhập mật khẩu">
+            </div>
+
+            <div class="forgot-wrapper">
+                <a href="#" class="forgot-link">Quên mật khẩu</a>
+            </div>
+
+            <div id="message" display="none"></div>
+
+            <button type="submit" class="btn-primary">Đăng nhập</button>
+
+            <div class="signup-link">
+                Không có tài khoản? <a href="#">Đăng ký</a>
+            </div>
+        </form>
+    </div>
+    <script>
+        console.log("Login page loaded");
+        const form = document.querySelector('form');
+        const messageDiv = document.getElementById('message');
+        const showMessage = (msg, isError = true) => {
+            messageDiv.style.display = 'block';
+            messageDiv.style.color = isError ? 'red' : 'green';
+            messageDiv.textContent = msg;
+        };
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            let username = form.querySelector('input[type="text"]').value;
+            let password = form.querySelector('input[type="password"]').value;
+            
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            }).then(response => {
+                if (!response.ok) {
+                    return response.json().then(errData => {
+                        throw new Error(errData.message || 'Đã xảy ra lỗi khi đăng nhập.');
+                    });
+                }
+                return response.json();
+                }
+            ).then(data => {
+                showMessage('Đăng nhập thành công!', false);
+                console.log('Token:', data.token);
+                // Lưu token vào localStorage hoặc cookie nếu cần
+            }).catch(error => {
+                showMessage(error.message);
+                console.error('Error:', error);
+            });
+
+        });
+    </script>
+
+</body>
+</html>

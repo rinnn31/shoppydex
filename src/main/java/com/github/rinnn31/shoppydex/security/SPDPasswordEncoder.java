@@ -1,11 +1,13 @@
-package com.github.rinnn31.shoppydex.utils;
+package com.github.rinnn31.shoppydex.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SPDPasswordEncoder implements PasswordEncoder {
     private static final String TAG = "SPD:";
 

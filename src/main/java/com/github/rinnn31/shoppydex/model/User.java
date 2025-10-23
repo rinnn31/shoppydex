@@ -5,42 +5,46 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "accounts")
-public class Account {
-    public static final String ROLE_ADMIN = "ROLE_ADMIN";
-    public static final String ROLE_USER = "ROLE_USER";
+public class User {
+    public static final String ROLE_ADMIN = "ADMIN";
+    public static final String ROLE_USER = "USER";
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "UserID")
+    private Long userId;
 
-    @Column(nullable = false, unique = true, name= "username")
-    private String usernameGGdff;
+    @Column(name = "Username", nullable = false, unique = true)
+    private String username;
 
-    @Column(unique = true)
+    @Column(name = "Email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "Password", nullable = false)
     private String password;
 
-    @Column(name = "role", nullable = false)
-    private String role = ROLE_USER;
+    @Column(name = "Role", nullable = false)
+    private String role;
 
-    public Account(String username, String email, String password) {
+    @Column(name = "Points", nullable = false)
+    private int points;
+
+    public User() {
+        // Default constructor for JPA
+    }
+
+    public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = ROLE_USER;
+        this.points = 0;
     }
 
     public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        return userId;
     }
 
     public String getUsername() {
@@ -77,5 +81,13 @@ public class Account {
         } else {
             throw new IllegalArgumentException("Invalid role: " + role);
         }
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 }
