@@ -1,7 +1,7 @@
 - Quy ước đặt tên
   + Tên class chuẩn PascalCase (ví dụ UserModel, CustomRepository)
   + Tên biến thì chuẩn camelCase (ví dụ myVariable, productName)
-  + Nếu đặt tên cho cột sử dụng trong database thì dùng snake_case (ví dụ user_id, product_name)
+  + Nếu đặt tên cho cột sử dụng trong database thì dùng PascalCase
   + Các hằng số (constant) viết hoa toàn bộ, các từ ngăn cách nhau bởi dấu gạch dưới (ví dụ MAX_SIZE, DEFAULT_TIMEOUT)
 
 - Cấu trúc thư mục
