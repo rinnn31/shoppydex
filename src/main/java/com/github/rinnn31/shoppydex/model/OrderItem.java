@@ -4,6 +4,7 @@ import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,21 +12,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Order {
+public class OrderItem {
     @Id
     @Column(name= "OrderId", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    @ManyToOne
-    @JoinColumn(name = "Owner", nullable = false, referencedColumnName = "UserID")
-    private User owner;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserId", nullable = false, referencedColumnName = "UserID")
+    private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "Product", nullable = false, referencedColumnName = "ProductID")
-    private Category product;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ProductID", nullable = false, referencedColumnName = "ProductID")
+    private Product product;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "Quantity", nullable = false)
     private int quantity;
 
     @Column(name = "TotalPrice", nullable = false)
@@ -34,13 +35,13 @@ public class Order {
     @Column(name = "OrderDate", nullable = false)
     private Date orderDate;
 
-    public Order() {
+    public OrderItem() {
         // Default constructor for JPA
     }
 
-    public Order(Long orderId, User owner, Category product, int quantity, double totalPrice, Date orderDate) {
+    public OrderItem(Long orderId, User owner, Product product, int quantity, double totalPrice, Date orderDate) {
         this.orderId = orderId;
-        this.owner = owner;
+        this.user = owner;
         this.product = product;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
@@ -55,19 +56,19 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public User getOwner() {
-        return owner;
+    public User getUser() {
+        return user;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setUser(User owner) {
+        this.user = owner;
     }
 
-    public Category getProduct() {
+    public Product getProduct() {
         return product;
     }
 
-    public void setProduct(Category product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
 

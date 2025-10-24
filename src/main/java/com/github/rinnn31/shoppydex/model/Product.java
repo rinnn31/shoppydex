@@ -36,10 +36,10 @@ public class Product {
     private Double price;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CategoryID", referencedColumnName = "Category", nullable = false)
+    @JoinColumn(name = "CategoryID", referencedColumnName = "CategoryID", nullable = false)
     private Category category;
 
-    @Column(name = "Extras", nullable = true, columnDefinition="JSON")
+    @Column(name = "Extras", nullable = true, columnDefinition = "JSON")
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> extras;
 

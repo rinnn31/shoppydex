@@ -10,25 +10,25 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.github.rinnn31.shoppydex.model.User;
 
 public class SecurityUserDetail implements UserDetails  {
-    private final User account;
+    private final User user;
 
-    public SecurityUserDetail(User account) {
-        this.account = account;
+    public SecurityUserDetail(User user) {
+        this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + account.getRole()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
     @Override
     public String getPassword() {
-        return account.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return account.getUsername();
+        return user.getUsername();
     }
     
 }
