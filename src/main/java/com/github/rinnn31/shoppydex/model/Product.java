@@ -35,11 +35,14 @@ public class Product {
     @Column(name = "Price")
     private Double price;
 
+    @Column(name = "Stock", nullable = false)
+    private Integer stock = 0; 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CategoryID", referencedColumnName = "CategoryID", nullable = false)
     private Category category;
 
-    @Column(name = "Extras", nullable = true, columnDefinition = "JSON")
+    @Column(name = "Extras", nullable = true)// , columnDefinition = "JSON"
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> extras;
 
@@ -106,6 +109,13 @@ public class Product {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 
     public String getImages() {
