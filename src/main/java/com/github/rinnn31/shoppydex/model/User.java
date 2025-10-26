@@ -31,6 +31,10 @@ public class User {
     @Column(name = "Points", nullable = false)
     private int points;
 
+    @Column(name = "IsVerified", nullable = false)
+    private boolean IsVerified;
+
+
     public User() {
         // Default constructor for JPA
     }
@@ -41,6 +45,7 @@ public class User {
         this.password = password;
         this.role = ROLE_USER;
         this.points = 0;
+        this.IsVerified = false;
     }
 
     public Long getId() {
@@ -89,5 +94,13 @@ public class User {
 
     public void setPoints(int points) {
         this.points = points;
+    }
+
+    public boolean isVerified() {
+        return IsVerified;
+    }
+
+    public void setVerified(boolean isVerified) {
+        IsVerified = isVerified;
     }
 }

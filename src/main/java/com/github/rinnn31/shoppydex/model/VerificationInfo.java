@@ -5,12 +5,9 @@ import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 @Entity
 public class VerificationInfo {
@@ -19,9 +16,8 @@ public class VerificationInfo {
     @Column(name="VerificationId")
     private Long id;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="UserID", nullable=false, referencedColumnName="UserID")
-    private User user;
+    @Column(name = "Username", nullable=false)
+    private String username;
 
     @Column(name = "Token", nullable=false)
     private String verificationToken;
@@ -39,8 +35,8 @@ public class VerificationInfo {
         // Default constructor for JPA
     }
 
-    public VerificationInfo(User user, String action, int validDurationMinutes) {
-        this.user = user;
+    public VerificationInfo(String username, String action, int validDurationMinutes) {
+        this.username = username;
         this.verificationToken = UUID.randomUUID().toString();
         this.action = action;
         this.createdAt = LocalDateTime.now();
@@ -51,8 +47,8 @@ public class VerificationInfo {
         return id;
     }
 
-    public User getUser() {
-        return user;
+    public String getUsername() {
+        return username;
     }
 
     public String getVerificationToken() {
@@ -71,8 +67,8 @@ public class VerificationInfo {
         return createdAt;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(String username) {
+        this.username = username;
     }
 
     public void setVerificationCode(String verificationToken) {

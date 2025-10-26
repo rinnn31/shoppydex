@@ -6,10 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.github.rinnn31.shoppydex.exception.UserNotFoundException;
-import com.github.rinnn31.shoppydex.model.User;
 import com.github.rinnn31.shoppydex.model.VerificationInfo;
-import com.github.rinnn31.shoppydex.repository.UserRepository;
 import com.github.rinnn31.shoppydex.repository.VerificationRepository;
 
 @Service
@@ -18,19 +15,17 @@ public class VerificationService {
 
     @Autowired
     private VerificationRepository verificationRepository;
-    
-    @Autowired
-    private UserRepository userRepository;
 
 
-    public boolean verifyToken(String token, String action) {
+    public boolean verifyToken(String username, String token, String action) {
         Optional<VerificationInfo> value = verificationRepository.findByVerificationToken(token);
         if (value.isEmpty()) {
             return false;
         }
         VerificationInfo verificationInfo = value.get();
-        // Token chỉ hợp lệ nếu action khớp và chưa hết hạn
-        if (!verificationInfo.getAction().equals(action) || verificationInfo.getExpiredAt().isBefore(LocalDateTime.now())) {
+        // Token chỉ hợp lệ nếu thuộc về đúng người dùng, đúng hành động và chưa hết hạn
+        if (!verificationInfo.getAction().equals(action) || !verificationInfo.getUsername().equals(username) ||
+            verificationInfo.getExpiredAt().isBefore(LocalDateTime.now())) {
             return false;
         }
         verificationRepository.delete(verificationInfo);
@@ -38,11 +33,7 @@ public class VerificationService {
     }
 
     public String createToken(String username, String action) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(username);
-        }
-        VerificationInfo verificationInfo = new VerificationInfo(user.get(), action, VERIFICATION_TOKEN_VALID_DURATION_MINUTES);
+        VerificationInfo verificationInfo = new VerificationInfo(username, action, VERIFICATION_TOKEN_VALID_DURATION_MINUTES);
         verificationRepository.save(verificationInfo);
         return verificationInfo.getVerificationToken();
     }
@@ -51,4 +42,7 @@ public class VerificationService {
         verificationRepository.deleteByExpiredAtBefore(LocalDateTime.now());
     }
 
+    public Optional<VerificationInfo> getLatestValidVerificationToken(String username, String action) {
+        return verificationRepository.findLatestValidByUserAndAction(username, action);
+    }
 }
