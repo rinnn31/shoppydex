@@ -20,7 +20,7 @@ public class VerificationInfo {
     private Long id;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="UserId", nullable=false, referencedColumnName="UserId")
+    @JoinColumn(name="UserID", nullable=false, referencedColumnName="UserID")
     private User user;
 
     @Column(name = "Token", nullable=false)
@@ -32,15 +32,19 @@ public class VerificationInfo {
     @Column(name = "ExpiredAt", nullable=false)
     private LocalDateTime expiredAt;
 
+    @Column(name = "CreatedAt", nullable=false)
+    private LocalDateTime createdAt;
+
     public VerificationInfo() {
         // Default constructor for JPA
     }
 
-    public VerificationInfo(User user, String action, Long validDurationMinutes) {
+    public VerificationInfo(User user, String action, int validDurationMinutes) {
         this.user = user;
         this.verificationToken = UUID.randomUUID().toString();
         this.action = action;
-        this.expiredAt = LocalDateTime.now().plusMinutes(validDurationMinutes);
+        this.createdAt = LocalDateTime.now();
+        this.expiredAt = this.createdAt.plusMinutes(validDurationMinutes);
     }
 
     public Long getId() {
@@ -63,6 +67,10 @@ public class VerificationInfo {
         return expiredAt;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -77,5 +85,13 @@ public class VerificationInfo {
 
     public void setExpiredAt(LocalDateTime expiredAt) {
         this.expiredAt = expiredAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(this.expiredAt);
     }
 }
