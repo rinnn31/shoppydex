@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
 import com.github.rinnn31.shoppydex.model.api.ApiResponse;
-import com.github.rinnn31.shoppydex.service.ProductService.DuplicateResourceException;
-
 import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
@@ -47,12 +45,6 @@ public class RESTExceptionHandler {
                 .orElse("Xác minh dữ liệu thất bại");
 
         return ResponseEntity.badRequest().body(ApiResponse.error(VALIDATION_ERROR_CODE, message));
-    }
-    
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<ApiResponse<?>> handleDuplicateResourceException(DuplicateResourceException ex) {
-        String message = ex.getMessage();
-        return ResponseEntity.badRequest().body(ApiResponse.error(101, message));
     }
 
     @ExceptionHandler(SPDException.class)
