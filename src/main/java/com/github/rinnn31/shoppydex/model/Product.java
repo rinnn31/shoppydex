@@ -38,7 +38,7 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CategoryID", referencedColumnName = "CategoryID", nullable = false)
     private Category category;
-
+    
     @Column(name = "Extras", nullable = true, columnDefinition = "JSON")
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> extras;
@@ -47,7 +47,6 @@ public class Product {
     private String images;
 
     public Product() {
-        // Default constructor for JPA
     }
 
     public Product(String name, String value,  Category category) {

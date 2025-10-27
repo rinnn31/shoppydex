@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
 import com.github.rinnn31.shoppydex.model.api.ApiResponse;
-
 import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
