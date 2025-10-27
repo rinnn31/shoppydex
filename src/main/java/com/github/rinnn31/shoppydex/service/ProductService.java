@@ -14,7 +14,7 @@ import com.github.rinnn31.shoppydex.model.Category;
 import com.github.rinnn31.shoppydex.model.api.CategoryDTO;
 import com.github.rinnn31.shoppydex.repository.CategoryRepository;
 import com.github.rinnn31.shoppydex.repository.ProductRepository;
-import com.github.rinnn31.shoppydex.utils.BitmapWriter;
+import com.github.rinnn31.shoppydex.utils.WebImageResolver;
 
 
 
@@ -53,7 +53,7 @@ public class ProductService {
         //Chuyển đổi categoryImage từ chuỗi base64 sang dạng byte[]
        String imagePath = null;
         if (categoryDTO.getCategoryImage() != null && !categoryDTO.getCategoryImage().isBlank()) {
-            BitmapWriter.writeImage(
+            WebImageResolver.writeImage(
                 categoryDTO.getName() + "-" + UUID.randomUUID() + ".png",
                 categoryDTO.getCategoryImage()
             );
