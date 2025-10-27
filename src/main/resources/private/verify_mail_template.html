@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác minh tài khoản</title>
+    <style>
+        body {
+            background-color: #f5f8fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 550px;
+            background-color: #ffffff;
+            margin: 40px auto;
+            padding: 32px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            color: #222;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #28a745;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 30px 0;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .button:hover {
+            background-color: #1e7e34;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            margin-top: 30px;
+        }
+
+        .logo {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 60px;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="Mail Icon">
+        </div>
+
+        <h2>Xác minh tài khoản của bạn</h2>
+
+        <p>Xin chào <strong>{{username}}</strong>,</p>
+
+        <p>
+            Cảm ơn bạn đã đăng ký tài khoản tại <strong>ShoppyDex</strong>!  
+            Để hoàn tất quá trình đăng ký, vui lòng nhấn vào nút bên dưới để xác minh địa chỉ email của bạn.  
+            Liên kết này sẽ hết hạn sau <strong>{{expirationMinutes}} phút</strong>.
+        </p>
+
+        <p style="text-align: center;">
+            <a href="{{verificationLink}}" class="button">Xác minh ngay</a>
+        </p>
+
+        <p>Nếu bạn không tạo tài khoản, vui lòng bỏ qua email này — tài khoản sẽ không được kích hoạt.</p>
+
+        <p class="footer">
+            © 2025 ShoppyDex — Mọi quyền được bảo lưu.
+        </p>
+    </div>
+</body>
+</html>
