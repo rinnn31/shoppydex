@@ -15,12 +15,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Transactional
     @Query("DELETE FROM Product p WHERE p.category.categoryId = :categoryId")
-    void deleteByCategoryId(@Param("categoryId") Long categoryId);
+    void deleteByCategoryId( Long categoryId);
 
     @Query("SELECT COALESCE(SUM(p.stock), 0) FROM Product p WHERE p.category.categoryId = :categoryId")
-    int sumStockByCategoryId(@Param("categoryId") Long categoryId);
+    int sumStockByCategoryId( Long categoryId);
 
     @Query("SELECT p.category.categoryId FROM Product p WHERE p.productId = :productId")
-    Long findCategoryIdByProductId(@Param("productId") Long productId);
+    Long findCategoryIdByProductId( Long productId);
 }
 

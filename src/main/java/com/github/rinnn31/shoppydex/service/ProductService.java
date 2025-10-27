@@ -2,6 +2,7 @@ package com.github.rinnn31.shoppydex.service;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,8 @@ import org.springframework.util.StringUtils;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
 import com.github.rinnn31.shoppydex.model.Category;
+import com.github.rinnn31.shoppydex.model.Product;
+import com.github.rinnn31.shoppydex.model.api.ApiResponse;
 import com.github.rinnn31.shoppydex.model.api.CategoryDTO;
 import com.github.rinnn31.shoppydex.repository.CategoryRepository;
 import com.github.rinnn31.shoppydex.repository.ProductRepository;
@@ -23,7 +26,34 @@ import com.github.rinnn31.shoppydex.utils.WebImageResolver;
 public class ProductService {
     @Autowired
     private ProductRepository productRepository;
+    public void deleteProductsByCategory(Long categoryId){
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new SPDException(101, "Danh muc khong ton tai");
+        } 
+        
+        productRepository.deleteByCategoryId(categoryId);
+        categoryRepository.updateStock(categoryId,0);
 
+    }
+    public void deleteCategory(Long categoryId){
+        categoryRepository.deleteById(categoryId);
+        productRepository.deleteByCategoryId(categoryId);
+    }
+    public void deleteProduct(Long productId){
+        Optional<Product> product = productRepository.findById(productId);
+        if(product.isEmpty()){
+            throw new SPDException(101, "Khong ton tai san pham");
+        }
+        if(product.get().getCategory().getProductType().equals("MULTI_ITEM")){
+            throw new SPDException(102, "Khong the xoa san pham MULTI_ITEM");
+        }
+        // if("MULTI_ITEM".equals(product.get().getCategory().getProductType()));
+        
+        productRepository.delete(product.get());
+        Category category = product.get().getCategory();
+        category.setStock(category.getStock()-1);
+        categoryRepository.save(category);
+    }
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -42,16 +72,7 @@ public class ProductService {
                 .orElse(false);
     }
 
-    public void deleteProductsByCategory(Long categoryId) {
-        productRepository.deleteByCategoryId(categoryId);
-    }
-
     // Cập nhật lại số lượng tồn của danh mục sau khi xóa sản phẩm
-    public void updateCategoryStock(Long categoryId) {
-        // Ví dụ: đếm lại tổng tồn kho sau khi xóa
-        int totalStock = productRepository.sumStockByCategoryId(categoryId);
-        categoryRepository.updateStock(categoryId, totalStock);
-    }
     
     public void deleteCategoryById(Long categoryId) {
         categoryRepository.deleteById(categoryId);
@@ -61,11 +82,7 @@ public class ProductService {
         productRepository.deleteById(productId);
     }
 
-    public void updateCategoryStockByProductId(Long productId) {
-        Long categoryId = productRepository.findCategoryIdByProductId(productId);
-        updateCategoryStock(categoryId);
-    }
-
+    
     public ProductService() {
     }
 
