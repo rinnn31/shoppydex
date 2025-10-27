@@ -24,8 +24,8 @@ public class CategoryApiController {
     
     @PostMapping("/add")
     public ApiResponse<?> addCategorywithImage(@Valid @RequestBody CategoryDTO categoryDTO) {
-        CategoryDTO createdCategory = categoryService.addCategory(categoryDTO);
-        return ApiResponse.success(createdCategory);
+        categoryService.addCategory(categoryDTO);
+        return ApiResponse.success(null);
     }
     @GetMapping("/type")
     public ApiResponse<?> getCategoryTypes() {
