@@ -80,23 +80,24 @@ public class UserService {
 
     public void sendVerificationEmail(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("Người dùng không tồn tại"));
+                .orElseThrow(() -> new UserNotFoundException(username));
 
         // Kiểm tra xem có yêu cầu xác minh nào gần đây không, chỉ cho phép gửi lại sau một khoảng thời gian
         Optional<VerificationInfo> existingVerification = verificationService.getLatestValidVerificationToken(username, ACTION_VERIFY_EMAIL);
         if (existingVerification.isPresent() && existingVerification.get().getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES))) {
             LocalDateTime nextAllowedTime = existingVerification.get().getCreatedAt().plusMinutes(DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES);
             Duration remainingSeconds = Duration.between(LocalDateTime.now(), nextAllowedTime);
-            throw new SPDException(102, "Vui lòng chờ" + remainingSeconds.toSeconds() + "giây để gửi lại email xác minh");
+            throw new SPDException(102, "Vui lòng chờ " + remainingSeconds.toSeconds() + " giây để gửi lại email xác minh");
         }
 
         String token = verificationService.createToken(username, ACTION_VERIFY_EMAIL);
         HashMap<String, String> templateData = new HashMap<>();
         templateData.put("username", user.getUsername());
         templateData.put("verificationLink", "http://127.0.0.1:8080/user/verify-email?token=" + token);
+        templateData.put("expirationMinutes", String.valueOf(VerificationService.VERIFICATION_TOKEN_VALID_DURATION_MINUTES));
         mailService.sendTemplatedEmail(user.getEmail(), 
                                "Xác minh email tài khoản ShoppyDex", 
-                          "/private/verify_mail_template.html", templateData);
+                          "private/verify_mail_template.html", templateData);
     }
 
 
@@ -109,7 +110,7 @@ public class UserService {
         if (existingVerification.isPresent() && existingVerification.get().getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES))) {
             LocalDateTime nextAllowedTime = existingVerification.get().getCreatedAt().plusMinutes(DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES);
             Duration remainingSeconds = Duration.between(LocalDateTime.now(), nextAllowedTime);
-            throw new SPDException(102, "Vui lòng chờ" + remainingSeconds.toSeconds() + "giây để gửi lại email xác minh");
+            throw new SPDException(102, "Vui lòng chờ " + remainingSeconds.toSeconds() + " giây để gửi lại email xác minh");
         }
 
         String token = verificationService.createToken(username, ACTION_RESET_PASSWORD);
@@ -118,6 +119,6 @@ public class UserService {
         templateData.put("resetLink", "http://127.0.0:8080/user/reset-password?token=" + token);
         mailService.sendTemplatedEmail(user.getEmail(), 
                                "Đặt lại mật khẩu tài khoản ShoppyDex", 
-                          "/private/reset_password_template.html", templateData);
+                          "private/reset_password_template.html", templateData);
     }
 }

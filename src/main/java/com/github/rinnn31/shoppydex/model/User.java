@@ -34,6 +34,8 @@ public class User {
     @Column(name = "IsVerified", nullable = false)
     private boolean IsVerified;
 
+    @Column(name = "ActiveToken")
+    private String activeToken;
 
     public User() {
         // Default constructor for JPA
@@ -46,6 +48,7 @@ public class User {
         this.role = ROLE_USER;
         this.points = 0;
         this.IsVerified = false;
+        this.activeToken = null;
     }
 
     public Long getId() {
@@ -102,5 +105,13 @@ public class User {
 
     public void setVerified(boolean isVerified) {
         IsVerified = isVerified;
+    }
+
+    public String getActiveToken() {
+        return activeToken;
+    }
+
+    public void setActiveToken(String activeToken) {
+        this.activeToken = activeToken;
     }
 }

@@ -33,6 +33,9 @@ public class AuthService {
         if (passwordEncoder.matches(password, user.getPassword())) {
             String token = jwtTokenService.generateToken(user.getUsername());
             long expirationTime = jwtTokenService.extractExpiration(token).getTime();
+            user.setActiveToken(token);
+            userRepository.save(user);
+            
             return new AuthenticationDTO(token, user.getUsername(), expirationTime);
         } else {
             return null;

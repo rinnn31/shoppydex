@@ -5,13 +5,14 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.rinnn31.shoppydex.model.VerificationInfo;
 import com.github.rinnn31.shoppydex.repository.VerificationRepository;
 
 @Service
 public class VerificationService {
-    private static final int VERIFICATION_TOKEN_VALID_DURATION_MINUTES = 30;
+    public static final int VERIFICATION_TOKEN_VALID_DURATION_MINUTES = 30;
 
     @Autowired
     private VerificationRepository verificationRepository;
@@ -32,12 +33,14 @@ public class VerificationService {
         return true;
     }
 
+    
     public String createToken(String username, String action) {
         VerificationInfo verificationInfo = new VerificationInfo(username, action, VERIFICATION_TOKEN_VALID_DURATION_MINUTES);
         verificationRepository.save(verificationInfo);
         return verificationInfo.getVerificationToken();
     }
 
+    @Transactional
     public void deleteExpiredVerifications() {
         verificationRepository.deleteByExpiredAtBefore(LocalDateTime.now());
     }
