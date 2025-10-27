@@ -116,10 +116,10 @@ public class Category {
     public void setCategoryImage(String categoryImage) {
         this.categoryImage = categoryImage;
     }
+
     public String getType() {
        return type;
     }
-
     public void setType(String type) {
         this.type = type;
     }
