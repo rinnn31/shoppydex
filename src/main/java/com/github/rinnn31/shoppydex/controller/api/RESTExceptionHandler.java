@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.github.rinnn31.shoppydex.model.api.ApiResponse;
+import com.github.rinnn31.shoppydex.service.ProductService.DuplicateResourceException;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -29,6 +30,7 @@ public class RESTExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleGenericException(Exception ex) {
+        ex.printStackTrace();   
         return ResponseEntity.status(500).body(ApiResponse.error(GENERIC_ERROR_CODE, "Lỗi máy chủ nội bộ: " + ex.getMessage()));
     }
 
@@ -40,6 +42,12 @@ public class RESTExceptionHandler {
                 .orElse("Xác minh dữ liệu thất bại");
 
         return ResponseEntity.badRequest().body(ApiResponse.error(VALIDATION_ERROR_CODE, message));
+    }
+    
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ApiResponse<?>> handleDuplicateResourceException(DuplicateResourceException ex) {
+        String message = ex.getMessage();
+        return ResponseEntity.badRequest().body(ApiResponse.error(101, message));
     }
 
 }
