@@ -8,6 +8,7 @@ public class ApiResponse<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String message;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final T data;
 
     public ApiResponse(int code, String message, T data) {

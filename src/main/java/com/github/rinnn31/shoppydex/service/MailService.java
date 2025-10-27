@@ -4,18 +4,26 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class MailService {
     @Autowired
-    private MailSender mailSender;
+    private JavaMailSender mailSender;
+
+    @Value("${sender.email.address}")
+    private String senderAddress;
 
     public void sendEmail(String to, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderAddress);
         message.setTo(to);
         message.setSubject(subject);
         message.setText(body);
@@ -29,8 +37,17 @@ public class MailService {
             for (Map.Entry<String, String> entry : attributes.entrySet()) {
                 template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
             }
-            sendEmail(to, subject, template);
-        } catch (IOException e) {
+            
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            helper.setFrom(senderAddress);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(template, true);
+
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
             /* ignored */
         }
     }
