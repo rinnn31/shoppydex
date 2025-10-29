@@ -1,8 +1,9 @@
 package com.github.rinnn31.shoppydex.service;
 
-import java.io.IOException;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -15,22 +16,30 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class MailService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
+    
     @Autowired
     private JavaMailSender mailSender;
 
     @Value("${sender.email.address}")
     private String senderAddress;
 
-    public void sendEmail(String to, String subject, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(senderAddress);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
-        mailSender.send(message);
+    public boolean sendEmail(String to, String subject, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(senderAddress);
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(body);
+            mailSender.send(message);
+            return true;
+        } catch (Exception e) {
+            LOGGER.error(String.format("Failed to send email to %s", to), e);
+            return false;
+        }
     }
 
-    public void sendTemplatedEmail(String to, String subject, String templatePath, Map<String, String> attributes) {
+    public boolean sendTemplatedEmail(String to, String subject, String templatePath, Map<String, String> attributes) {
         ClassPathResource templateResource = new ClassPathResource(templatePath);
         try {
             String template = new String(templateResource.getInputStream().readAllBytes());
@@ -45,10 +54,11 @@ public class MailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(template, true);
-
             mailSender.send(mimeMessage);
+            return true;
         } catch (Exception e) {
-            /* ignored */
+            LOGGER.error(String.format("Failed to send email to %s", to), e);
+            return false;
         }
     }
 }

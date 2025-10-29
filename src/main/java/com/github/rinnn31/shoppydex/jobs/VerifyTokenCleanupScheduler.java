@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import com.github.rinnn31.shoppydex.service.VerificationService;
 
 @Component
-public class TokenCleanupScheduler {
+public class VerifyTokenCleanupScheduler {
     
     @Autowired
     private VerificationService verificationService;

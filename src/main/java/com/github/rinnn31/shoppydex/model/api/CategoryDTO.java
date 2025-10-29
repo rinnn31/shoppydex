@@ -20,7 +20,7 @@ public class CategoryDTO {
     @PositiveOrZero(message = "Giá sản phẩm phải không được âm")
     private Double price;
 
-    private Integer stock;
+    private Integer stock = 0;
 
     private String categoryImage;
     
@@ -48,13 +48,13 @@ public class CategoryDTO {
         return description;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
     public String getType() {
         return type;
     }
-    public int getStock() {
+    public Integer getStock() {
         return stock;
     }
 

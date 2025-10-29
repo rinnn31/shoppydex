@@ -109,7 +109,7 @@ public class ProductService {
         //Chuyển đổi categoryImage từ chuỗi base64 sang dạng byte[]
        String imagePath = null;
         if (categoryDTO.getCategoryImage() != null && !categoryDTO.getCategoryImage().isBlank()) {
-            WebImageResolver.writeImage(
+            imagePath = WebImageResolver.pushImage(
                 categoryDTO.getName() + "-" + UUID.randomUUID() + ".png",
                 categoryDTO.getCategoryImage()
             );

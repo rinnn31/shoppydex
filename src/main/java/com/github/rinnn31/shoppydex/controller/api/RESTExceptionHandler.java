@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
 import com.github.rinnn31.shoppydex.model.api.ApiResponse;
+
 import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
@@ -18,7 +19,7 @@ public class RESTExceptionHandler {
 
     private static final int GENERIC_ERROR_CODE = -1;
 
-    private static final Logger logger = LoggerFactory.getLogger(RESTExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RESTExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException ex) {
@@ -33,7 +34,7 @@ public class RESTExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleGenericException(Exception ex) {
-        logger.error("Unhandled exception occurred", ex);
+        LOGGER.error("Unhandled exception occurred", ex);
         return ResponseEntity.status(500).body(ApiResponse.error(GENERIC_ERROR_CODE, "Lỗi không xác định"));
     }
 
