@@ -1,9 +1,12 @@
 package com.github.rinnn31.shoppydex.controller.api;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.github.rinnn31.shoppydex.model.api.ApiResponse;
+import com.github.rinnn31.shoppydex.model.api.ProductDTO;
 import com.github.rinnn31.shoppydex.service.ProductService;
 
 @RestController
@@ -33,4 +36,16 @@ public class ProductApiController {
         productService.deleteProduct(id);
         return ApiResponse.success(null);
     }
+
+    @PostMapping
+    public ApiResponse<Void> addProduct(@RequestBody ProductDTO productDTO) {
+        productService.addProduct(productDTO);
+        return ApiResponse.success(null);
+    }
+
+    @GetMapping
+    public ApiResponse<List<ProductDTO>> getProductsByCategory(@RequestParam("categoryId") Long categoryId) {
+        return ApiResponse.success(productService.getProductsByCategoryId(categoryId));
+    }
+
 }

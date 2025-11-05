@@ -57,6 +57,10 @@ public class Category {
         return categoryId;
     }
 
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
     public String getName() {
         return name;
     }

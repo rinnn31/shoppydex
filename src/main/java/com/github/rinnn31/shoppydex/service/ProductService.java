@@ -13,12 +13,11 @@ import org.springframework.util.StringUtils;
 import com.github.rinnn31.shoppydex.exception.SPDException;
 import com.github.rinnn31.shoppydex.model.Category;
 import com.github.rinnn31.shoppydex.model.Product;
-import com.github.rinnn31.shoppydex.model.api.ApiResponse;
 import com.github.rinnn31.shoppydex.model.api.CategoryDTO;
+import com.github.rinnn31.shoppydex.model.api.ProductDTO;
 import com.github.rinnn31.shoppydex.repository.CategoryRepository;
 import com.github.rinnn31.shoppydex.repository.ProductRepository;
 import com.github.rinnn31.shoppydex.utils.WebImageResolver;
-
 
 
 
@@ -105,9 +104,8 @@ public class ProductService {
             throw new SPDException(101, "Tên danh mục đã tồn tại!");
         }
 
-
-        //Chuyển đổi categoryImage từ chuỗi base64 sang dạng byte[]
-       String imagePath = null;
+        // Chuyển đổi categoryImage từ chuỗi base64 sang file và lưu đường dẫn vào entity
+        String imagePath = null;
         if (categoryDTO.getCategoryImage() != null && !categoryDTO.getCategoryImage().isBlank()) {
             imagePath = WebImageResolver.pushImage(
                 categoryDTO.getName() + "-" + UUID.randomUUID() + ".png",
@@ -145,6 +143,69 @@ public class ProductService {
         return categoryRepository.findDistinctByType();
     }
 
+    // THÊM SẢN PHẨM MỚI`
+    public void addProduct(ProductDTO request) {
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new SPDException(101, "Danh mục không tồn tại"));
+
+        String productType = category.getProductType();
+
+        if ("UNIQUE_ITEM".equals(productType)) {
+            if (productRepository.existsByName(request.getName())) {
+                throw new SPDException(101, "Tên sản phẩm đã tồn tại!");
+            }
+
+            String imagePath = null;
+            if (request.getProductImages() != null && !request.getProductImages().isEmpty()) {
+                String filename = request.getName() + "-" + UUID.randomUUID();
+                imagePath = WebImageResolver.pushImage(filename, request.getProductImages().get(0));
+            }
+
+            Product product = new Product();
+            product.setName(request.getName());
+            product.setDescription(request.getDescription());
+            product.setValue(request.getValue());
+            product.setPrice(request.getPrice());
+            product.setStock(1);
+            product.setImages(imagePath);
+            product.setExtras(request.getExtras());
+            product.setCategory(category);
+
+            productRepository.save(product);
+
+            category.setStock(category.getStock() + 1);
+            categoryRepository.save(category);
+
+        } else if ("MULTI_ITEM".equals(productType)) {
+            int stockToAdd = (request.getStock() == null || request.getStock() <= 0) ? 1 : request.getStock();
 
 
-} 
+            Product product = new Product();
+            product.setValue(request.getValue());
+
+            productRepository.save(product);
+            category.setStock(category.getStock() + 1);
+            categoryRepository.save(category);
+        }
+    }
+
+    // LẤY DANH SÁCH SẢN PHẨM THEO CATEGORY
+    public List<ProductDTO> getProductsByCategoryId(Long categoryId) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new SPDException(101, "Id danh mục không tồn tại!");
+        }
+
+        Category category = categoryRepository.findById(categoryId).orElseThrow();
+        
+        if (!"UNIQUE_ITEM".equals(category.getProductType())) {
+            throw new SPDException(102, "Nếu category của sản phẩm thuộc loại MULTI_ITEM thì trả về");
+        }
+
+        List<Product> products = productRepository.findAll().stream()
+                .filter(p -> p.getCategory().getCategoryId().equals(categoryId))
+                .toList();
+
+        return products.stream().map(ProductDTO::new).collect(Collectors.toList());
+    }
+
+}

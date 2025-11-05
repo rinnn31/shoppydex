@@ -20,14 +20,30 @@ public class ProductDTO {
 
     private final List<String> images;
 
+    // thêm các field mới cho request
+    private String value;
+    private Integer stock;
+
+    public ProductDTO() {
+        this.productId = null;
+        this.name = null;
+        this.description = null;
+        this.price = null;
+        this.extras = null;
+        this.categoryId = null;
+        this.images = null;
+    }
+
     public ProductDTO(Product product) {
         this.productId = product.getProductId();
         this.name = product.getName();
         this.description = product.getDescription();
         this.price = product.getPrice();
-        this.categoryId = product.getCategory().getProductId();
+        this.categoryId = product.getCategory().getCategoryId();
         this.images = List.of(product.getImages().split(","));
         this.extras = product.getExtras();
+        this.value = product.getValue();
+        this.stock = product.getStock();
     }
 
     public Long getProductId() {
@@ -49,12 +65,28 @@ public class ProductDTO {
     public Long getCategoryId() {
         return categoryId;
     }
-
+    
     public List<String> getProductImages() {
         return images;
     }
 
     public Map<String, Object> getExtras() {
         return extras;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 }
