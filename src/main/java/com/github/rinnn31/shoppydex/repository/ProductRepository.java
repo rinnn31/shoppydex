@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import com.github.rinnn31.shoppydex.model.Product;
 
+import java.util.Optional;
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
@@ -22,5 +24,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT p.category.categoryId FROM Product p WHERE p.productId = :productId")
     Long findCategoryIdByProductId( Long productId);
+
+    Optional<Product> findByName(String name);
+    boolean existsByName(String name);
 }
 
