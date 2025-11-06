@@ -3,12 +3,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShoppyDex - Đăng nhập</title>
-    <link rel="stylesheet" href="/css/login_style.css">
+    <link rel="stylesheet" href="/css/authenticate.css">
 </head>
 <body>
     <div class="logo">
         <div class="logo-icon"></div>
-        <span>InsideBox</span>
+        <span>ShoppyDex</span>
     </div>
 
     <div class="container">
@@ -19,7 +19,7 @@
         <form>
             <div class="form-group">
                 <label for="email">Email/Username</label>
-                <input type="text" placeholder="Nhập ịa chỉ email hoặc username">
+                <input type="text" placeholder="Nhập địa chỉ email hoặc username">
             </div>
 
             <div class="form-group">
@@ -28,7 +28,7 @@
             </div>
 
             <div class="forgot-wrapper">
-                <a href="#" class="forgot-link">Quên mật khẩu</a>
+                <a href="/forgot-password" class="forgot-link">Quên mật khẩu</a>
             </div>
 
             <div id="message" display="none"></div>
@@ -36,18 +36,28 @@
             <button type="submit" class="btn-primary">Đăng nhập</button>
 
             <div class="signup-link">
-                Không có tài khoản? <a href="#">Đăng ký</a>
+                Không có tài khoản? <a href="/register">Đăng ký</a>
             </div>
         </form>
     </div>
-    <script>
+    <script type="module">
+        import {AuthenticationAPI} from '/js/api.js';
+
         console.log("Login page loaded");
         const form = document.querySelector('form');
         const messageDiv = document.getElementById('message');
         const showMessage = (msg, isError = true) => {
-            messageDiv.style.display = 'block';
-            messageDiv.style.color = isError ? 'red' : 'green';
             messageDiv.textContent = msg;
+            messageDiv.style.display = 'block';
+            if (isError) {
+                messageDiv.style.color = '#e74c3c';
+                messageDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.15)';
+                messageDiv.style.border = '1px solid rgba(231, 76, 60, 0.5)';
+            } else {
+                messageDiv.style.color = '#2ecc71';
+                messageDiv.style.backgroundColor = 'rgba(46, 204, 113, 0.15)';
+                messageDiv.style.border = '1px solid rgba(46, 204, 113, 0.5)';
+            }
         };
 
         form.addEventListener('submit', async function(event) {
@@ -56,27 +66,32 @@
             let username = form.querySelector('input[type="text"]').value;
             let password = form.querySelector('input[type="password"]').value;
             
-            fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            }).then(response => {
-                if (!response.ok) {
-                    return response.json().then(errData => {
-                        throw new Error(errData.message || 'Đã xảy ra lỗi khi đăng nhập.');
-                    });
+            let data = {
+                username: username,
+                password: password
+            };
+            AuthenticationAPI.login(data).then(response => {
+                if (response.code === 0) {
+                    const authToken = response.data.token;
+                    localStorage.setItem('authToken', authToken);
+                    showMessage("Đăng nhập thành công!", false);
+                     
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    let errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
+                    if (response.message) {
+                        errorMsg = response.message;
+                    }
+                    showMessage(errorMsg, true);
                 }
-                return response.json();
-                }
-            ).then(data => {
-                showMessage('Đăng nhập thành công!', false);
-                console.log('Token:', data.token);
-                // Lưu token vào localStorage hoặc cookie nếu cần
             }).catch(error => {
-                showMessage(error.message);
-                console.error('Error:', error);
+                let errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
+                if (error && error.message) {
+                    errorMsg = error.message;
+                }
+                showMessage(errorMsg, true);
             });
 
         });

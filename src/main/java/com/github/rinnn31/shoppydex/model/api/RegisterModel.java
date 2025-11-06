@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class RegisterDTO {
+public class RegisterModel {
     @NotBlank(message = "Username không được để trống")
     @Size(min = 3, max = 20, message = "Username phải có từ 3 đến 20 ký tự")
     private String username;

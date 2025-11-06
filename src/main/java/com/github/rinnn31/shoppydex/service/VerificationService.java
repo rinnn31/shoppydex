@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.github.rinnn31.shoppydex.model.VerificationInfo;
+import com.github.rinnn31.shoppydex.model.entity.VerificationInfoEntity;
 import com.github.rinnn31.shoppydex.repository.VerificationRepository;
 
 @Service
@@ -19,11 +19,11 @@ public class VerificationService {
 
 
     public boolean verifyToken(String username, String token, String action) {
-        Optional<VerificationInfo> value = verificationRepository.findByVerificationToken(token);
+        Optional<VerificationInfoEntity> value = verificationRepository.findByVerificationToken(token);
         if (value.isEmpty()) {
             return false;
         }
-        VerificationInfo verificationInfo = value.get();
+        VerificationInfoEntity verificationInfo = value.get();
         // Token chỉ hợp lệ nếu thuộc về đúng người dùng, đúng hành động và chưa hết hạn
         if (!verificationInfo.getAction().equals(action) || !verificationInfo.getUsername().equals(username) ||
             verificationInfo.getExpiredAt().isBefore(LocalDateTime.now())) {
@@ -35,7 +35,7 @@ public class VerificationService {
 
     
     public String createToken(String username, String action) {
-        VerificationInfo verificationInfo = new VerificationInfo(username, action, VERIFICATION_TOKEN_VALID_DURATION_MINUTES);
+        VerificationInfoEntity verificationInfo = new VerificationInfoEntity(username, action, VERIFICATION_TOKEN_VALID_DURATION_MINUTES);
         verificationRepository.save(verificationInfo);
         return verificationInfo.getVerificationToken();
     }
@@ -45,7 +45,7 @@ public class VerificationService {
         verificationRepository.deleteByExpiredAtBefore(LocalDateTime.now());
     }
 
-    public Optional<VerificationInfo> getLatestValidVerificationToken(String username, String action) {
+    public Optional<VerificationInfoEntity> getLatestValidVerificationToken(String username, String action) {
         return verificationRepository.findLatestValidByUserAndAction(username, action);
     }
 }

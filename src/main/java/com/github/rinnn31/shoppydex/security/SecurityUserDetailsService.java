@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.github.rinnn31.shoppydex.exception.UserNotFoundException;
-import com.github.rinnn31.shoppydex.model.User;
+import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 import com.github.rinnn31.shoppydex.repository.UserRepository;
 
 @Service
@@ -18,7 +18,7 @@ public class SecurityUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
         return new SecurityUserDetail(user);
     }

@@ -23,7 +23,7 @@ public class SPDAccessHandler implements AccessDeniedHandler, AuthenticationEntr
         if (request.getRequestURI().startsWith("/api/")) {
             writeJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access to API");
         } else {
-            writeHtmlResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "static/html/401.html");
+            writeHtmlResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "private/401.html");
         }
     }
 
@@ -33,7 +33,7 @@ public class SPDAccessHandler implements AccessDeniedHandler, AuthenticationEntr
         if (request.getRequestURI().startsWith("/api/")) {
             writeJsonResponse(response, HttpServletResponse.SC_FORBIDDEN, "Forbidden access to API");       
         } else {
-            writeHtmlResponse(response, HttpServletResponse.SC_FORBIDDEN, "static/html/403.html");
+            writeHtmlResponse(response, HttpServletResponse.SC_FORBIDDEN, "private/403.html");
         }
     }
 

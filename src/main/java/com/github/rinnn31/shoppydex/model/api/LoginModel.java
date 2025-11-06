@@ -2,7 +2,7 @@ package com.github.rinnn31.shoppydex.model.api;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class LoginDTO {
+public class LoginModel {
     @NotBlank(message = "Username/Email không được để trống")
     private String username;
 

@@ -1,29 +1,32 @@
-package com.github.rinnn31.shoppydex.model;
+package com.github.rinnn31.shoppydex.model.entity;
 
+import java.util.List;
 import java.util.Map;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import com.github.rinnn31.shoppydex.utils.JsonObjectConverter;
+import com.github.rinnn31.shoppydex.utils.StringArrayConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 
-@Entity
-public class Product {
+@Entity(name = "ProductItem")
+public class ProductItemEntity {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="product_seq_gen")
     @SequenceGenerator(name="product_seq_gen", sequenceName="product_seq", allocationSize=50, initialValue=1000000)
-    @Column(name = "ProductID")
-    private Long productId;
+    @Column(name = "ProductItemID")
+    private Long productItemId;
 
-    @Column(name = "Name", nullable = false)
+    @Column(name = "Name")
     private String name;
 
     @Column(name = "Description")
@@ -35,31 +38,36 @@ public class Product {
     @Column(name = "Price")
     private Double price;
 
-    @Column(name = "Stock", nullable = false)
-    private Integer stock = 0; 
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CategoryID", referencedColumnName = "CategoryID", nullable = false)
-    private Category category;
+    @JoinColumn(name = "ProductID", referencedColumnName = "ProductID", nullable = false)
+    private ProductEntity product;
     
-    @Column(name = "Extras", nullable = true, columnDefinition = "JSON")
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Lob
+    @Column(name = "Extras", nullable = true)
+    @Convert(converter = JsonObjectConverter.class)
     private Map<String, Object> extras;
 
-    @Column(name = "Images", nullable = true)
-    private String images;
+    // Lưu trữ danh sách đường dẫn hình ảnh, cách nhau bằng dấu phẩy
+    @Column(name = "Images")
+    @Lob
+    @Convert(converter = StringArrayConverter.class)
+    private List<String> images;
 
-    public Product() {
+    public ProductItemEntity() {
     }
 
-    public Product(String name, String value,  Category category) {
-        this.name = name;
+    public ProductItemEntity(String value,  ProductEntity product) {
         this.value = value;
-        this.category = category;
+        this.product = product;
+        this.name = null;
+        this.description = null;
+        this.extras = null;
+        this.price = null;
+        this.images = null;
     }
 
-    public Long getProductId() {
-        return productId;
+    public Long getProductItemId() {
+        return productItemId;
     }
 
     public String getValue() {
@@ -86,12 +94,12 @@ public class Product {
         this.description = description;
     }
 
-    public Category getCategory() {
-        return category;
+    public ProductEntity getProduct() {
+        return product;
     }
 
-    public void setCategory(Category product) {
-        this.category = product;
+    public void setProduct(ProductEntity product) {
+        this.product = product;
     }
 
     public Map<String, Object> getExtras() {
@@ -109,19 +117,12 @@ public class Product {
     public void setPrice(Double price) {
         this.price = price;
     }
-    public Integer getStock() {
-        return stock;
-    }
 
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
-    public String getImages() {
+    public List<String> getImages() {
         return images;
     }
 
-    public void setImages(String images) {
+    public void setImages(List<String> images) {
         this.images = images;
     }
 

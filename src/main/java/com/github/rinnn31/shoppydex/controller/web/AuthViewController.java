@@ -18,4 +18,9 @@ public class AuthViewController {
     public void registerView(HttpServletResponse response) {
         WebViewRenderer.renderView(response, "private/register.html");
     }
+
+    @GetMapping("/forgot-password")
+    public void forgotPasswordView(HttpServletResponse response) {
+        WebViewRenderer.renderView(response, "private/forgot-password.html");
+    }
 }

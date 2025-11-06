@@ -124,6 +124,10 @@ input::placeholder {
     color: #8B9DC3;
 }
 
+input::-ms-reveal {
+  filter: invert(50%);
+}
+
 .forgot-wrapper {
     text-align: right;
     margin-bottom: 25px;
@@ -160,6 +164,8 @@ input::placeholder {
     text-align: left;
     margin-bottom: 25px;
     font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 7px;
 }
 
 .btn-primary {

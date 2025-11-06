@@ -1,4 +1,4 @@
-package com.github.rinnn31.shoppydex.model;
+package com.github.rinnn31.shoppydex.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,8 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Entity
-public class User {
+@Entity(name = "User")
+public class UserEntity {
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_USER = "USER";
 
@@ -29,24 +29,24 @@ public class User {
     private String role;
 
     @Column(name = "Points", nullable = false)
-    private int points;
+    private Double points;
 
     @Column(name = "IsVerified", nullable = false)
-    private boolean IsVerified;
+    private Boolean IsVerified;
 
     @Column(name = "ActiveToken")
     private String activeToken;
 
-    public User() {
+    public UserEntity() {
         // Default constructor for JPA
     }
 
-    public User(String username, String email, String password) {
+    public UserEntity(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = ROLE_USER;
-        this.points = 0;
+        this.points = 0.0;
         this.IsVerified = false;
         this.activeToken = null;
     }
@@ -91,11 +91,11 @@ public class User {
         }
     }
 
-    public int getPoints() {
+    public Double getPoints() {
         return points;
     }
 
-    public void setPoints(int points) {
+    public void setPoints(Double points) {
         this.points = points;
     }
 

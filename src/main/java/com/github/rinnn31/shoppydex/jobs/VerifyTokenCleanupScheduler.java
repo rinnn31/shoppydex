@@ -12,7 +12,7 @@ public class VerifyTokenCleanupScheduler {
     @Autowired
     private VerificationService verificationService;
 
-    @Scheduled(fixedDelay=180000) 
+    @Scheduled(fixedDelay=3600000) 
     public void cleanupExpiredTokens() {
         verificationService.deleteExpiredVerifications();
     }

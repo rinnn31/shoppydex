@@ -3,7 +3,7 @@ package com.github.rinnn31.shoppydex.model.api;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class ChangePasswordDTO {
+public class ChangePasswordModel {
     @NotBlank(message = "Mật khẩu cũ không được để trống")
     private String oldPassword;
 
@@ -11,11 +11,11 @@ public class ChangePasswordDTO {
     @Size(min = 6, message = "Mật khẩu mới phải có ít nhất 6 ký tự")
     private String newPassword;
 
-    public ChangePasswordDTO() {
+    public ChangePasswordModel() {
     
     }
 
-    public ChangePasswordDTO(String oldPassword, String newPassword) {
+    public ChangePasswordModel(String oldPassword, String newPassword) {
         this.oldPassword = oldPassword;
         this.newPassword = newPassword;
     }

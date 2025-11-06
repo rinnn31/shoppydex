@@ -1,4 +1,4 @@
-package com.github.rinnn31.shoppydex.model;
+package com.github.rinnn31.shoppydex.model.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -9,8 +9,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Entity
-public class VerificationInfo {
+@Entity(name = "VerificationInfo")
+public class VerificationInfoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="VerificationId")
@@ -31,11 +31,11 @@ public class VerificationInfo {
     @Column(name = "CreatedAt", nullable=false)
     private LocalDateTime createdAt;
 
-    public VerificationInfo() {
+    public VerificationInfoEntity() {
         // Default constructor for JPA
     }
 
-    public VerificationInfo(String username, String action, int validDurationMinutes) {
+    public VerificationInfoEntity(String username, String action, int validDurationMinutes) {
         this.username = username;
         this.verificationToken = UUID.randomUUID().toString();
         this.action = action;

@@ -1,60 +1,69 @@
-package com.github.rinnn31.shoppydex.model;
+package com.github.rinnn31.shoppydex.model.entity;
+
+import java.util.List;
+
+import com.github.rinnn31.shoppydex.utils.StringArrayConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.SequenceGenerator;
 
-@Entity
-public class Category {
+@Entity(name = "Product")
+public class ProductEntity {
     public static final String TYPE_UNIQUE_ITEMS = "UNIQUE_ITEM";
     public static final String TYPE_MULTI_ITEMS = "MULTI_ITEM";
 
     @Id
-    @Column(name = "CategoryID")
+    @Column(name = "ProductID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="category_seq_gen")
     @SequenceGenerator(name="category_seq_gen", sequenceName="category_seq", allocationSize=1, initialValue=1000000)
-    private Long categoryId;
+    private Long productId;
 
     @Column(name = "Name", nullable = false)
     private String name;
 
-    @Column(name = "Description", nullable = true)
+    @Column(name = "Description")
     private String description;
 
     @Column(name = "Price")
     private Double price;
 
     @Column(name = "Stock", nullable = false)
-    private Integer stock;
+    private Integer stock = 0;
 
-    @Column(name = "Type", nullable = false)
-    private String type;
+    @Column(name = "Category", nullable = false)
+    private String category;
 
     @Column(name = "ProductType", nullable = false)
     private String productType;
 
-    @Column(name = "CategoryImage", nullable = true)
-    private String categoryImage;
+    // Lưu trữ danh sách đường dẫn hình ảnh, cách nhau bằng dấu phẩy
+    @Column(name = "Images")
+    @Lob
+    @Convert(converter = StringArrayConverter.class)
+    private List<String> images;
 
-    public Category() {
+    public ProductEntity() {
         // Default constructor for JPA
     }
 
-    public Category(String name, String description, double price, String type, String productType) {
+    public ProductEntity(String name, String category, String productType) {
         this.name = name;
-        this.description = description;
-        this.price = price;
-        this.type = type;
+        this.description = null;
+        this.price = null;
+        this.category = category;
         this.productType = productType;
         this.stock = 0;
-        this.categoryImage = null;
+        this.images = null;
     }
 
     public Long getProductId() {
-        return categoryId;
+        return productId;
     }
 
     public String getName() {
@@ -90,11 +99,11 @@ public class Category {
     }
 
     public String getCategory() {
-        return type;
+        return category;
     }
 
     public void setCategory(String category) {
-        this.type = category;
+        this.category = category;
     }
 
     public String getProductType() {
@@ -109,18 +118,11 @@ public class Category {
         }
     }
 
-    public String getCategoryImage() {
-        return categoryImage;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setCategoryImage(String categoryImage) {
-        this.categoryImage = categoryImage;
-    }
-
-    public String getType() {
-       return type;
-    }
-    public void setType(String type) {
-        this.type = type;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 }

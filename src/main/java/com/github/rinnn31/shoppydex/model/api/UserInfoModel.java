@@ -1,27 +1,27 @@
 package com.github.rinnn31.shoppydex.model.api;
 
-import com.github.rinnn31.shoppydex.model.User;
+import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 
-public class UserDTO {
+public class UserInfoModel {
     private String username;
 
     private String email;
 
-    private int points;
+    private Double points;
 
-    private boolean isVerified;
+    private Boolean isVerified;
 
-    public UserDTO() {
+    public UserInfoModel() {
     }
 
-    public UserDTO(String username, String email, int points, boolean isVerified) {
+    public UserInfoModel(String username, String email, Double points, Boolean isVerified) {
         this.username = username;
         this.email = email;
         this.points = points;
         this.isVerified = isVerified;
     }
 
-    public UserDTO(User user) {
+    public UserInfoModel(UserEntity user) {
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.points = user.getPoints();
@@ -36,11 +36,11 @@ public class UserDTO {
         return email;
     }
 
-    public int getPoints() {
+    public Double getPoints() {
         return points;
     }
 
-    public boolean isVerified() {
+    public Boolean isVerified() {
         return isVerified;
     }
 
@@ -52,11 +52,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public void setPoints(int points) {
+    public void setPoints(Double points) {
         this.points = points;
     }
 
-    public void setVerified(boolean isVerified) {
+    public void setVerified(Boolean isVerified) {
         this.isVerified = isVerified;
     }
 }
