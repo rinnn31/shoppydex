@@ -1,20 +1,23 @@
 package com.github.rinnn31.shoppydex.model.entity;
 
+import java.util.List;
+
+import com.github.rinnn31.shoppydex.model.enums.UserRole;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity(name = "User")
 public class UserEntity {
-    public static final String ROLE_ADMIN = "ADMIN";
-    public static final String ROLE_USER = "USER";
-
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name = "UserID")
-    private Long userId;
+    @Column(name = "UserId")
+    private long userId;
 
     @Column(name = "Username", nullable = false, unique = true)
     private String username;
@@ -29,13 +32,16 @@ public class UserEntity {
     private String role;
 
     @Column(name = "Points", nullable = false)
-    private Double points;
+    private int points;
 
     @Column(name = "IsVerified", nullable = false)
-    private Boolean IsVerified;
+    private boolean IsVerified;
 
     @Column(name = "ActiveToken")
     private String activeToken;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<OrderItemEntity> orders;
 
     public UserEntity() {
         // Default constructor for JPA
@@ -45,13 +51,13 @@ public class UserEntity {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.role = ROLE_USER;
-        this.points = 0.0;
+        this.role = UserRole.USER.name();
+        this.points = 0;
         this.IsVerified = false;
         this.activeToken = null;
     }
 
-    public Long getId() {
+    public long getId() {
         return userId;
     }
 
@@ -83,19 +89,15 @@ public class UserEntity {
         return role;
     }
 
-    public void setRole(String role) {
-        if (ROLE_ADMIN.equals(role) || ROLE_USER.equals(role)) {
-            this.role = role;
-        } else {
-            throw new IllegalArgumentException("Invalid role: " + role);
-        }
+    public void setRole(UserRole role) {
+        this.role = role.name();    
     }
 
-    public Double getPoints() {
+    public int getPoints() {
         return points;
     }
 
-    public void setPoints(Double points) {
+    public void setPoints(int points) {
         this.points = points;
     }
 
@@ -113,5 +115,9 @@ public class UserEntity {
 
     public void setActiveToken(String activeToken) {
         this.activeToken = activeToken;
+    }
+
+    public List<OrderItemEntity> getOrders() {
+        return orders;
     }
 }

@@ -1,7 +1,6 @@
 package com.github.rinnn31.shoppydex.model.entity;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,13 +13,13 @@ public class VerificationInfoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="VerificationId")
-    private Long id;
+    private long id;
 
     @Column(name = "Username", nullable=false)
     private String username;
 
-    @Column(name = "Token", nullable=false)
-    private String verificationToken;
+    @Column(name = "Code", nullable=false)
+    private String code;
 
     @Column(name = "Action", nullable=false)
     private String action;
@@ -37,13 +36,13 @@ public class VerificationInfoEntity {
 
     public VerificationInfoEntity(String username, String action, int validDurationMinutes) {
         this.username = username;
-        this.verificationToken = UUID.randomUUID().toString();
+        this.code = String.format("%06d", (int)(Math.random() * 1000000));
         this.action = action;
         this.createdAt = LocalDateTime.now();
         this.expiredAt = this.createdAt.plusMinutes(validDurationMinutes);
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -51,8 +50,8 @@ public class VerificationInfoEntity {
         return username;
     }
 
-    public String getVerificationToken() {
-        return verificationToken;
+    public String getCode() {
+        return code;
     }
 
     public String getAction() {
@@ -71,8 +70,8 @@ public class VerificationInfoEntity {
         this.username = username;
     }
 
-    public void setVerificationCode(String verificationToken) {
-        this.verificationToken = verificationToken;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public void setAction(String action) {

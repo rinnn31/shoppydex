@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập / Đăng Ký - ShopAcc</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/toast.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            flex-grow: 1;
+            width: 90%;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 0;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            background: none;
+            color: #999;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            bottom: -2px;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .toggle-password:hover {
+            color: #667eea;
+        }
+
+        .form-input.with-icon {
+            padding-right: 40px;
+        }
+
+        .password-strength {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .password-strength.weak {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .password-strength.medium {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .password-strength.strong {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .strength-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .strength-fill.weak {
+            background: #e74c3c;
+            width: 33%;
+        }
+
+        .strength-fill.medium {
+            background: #f39c12;
+            width: 66%;
+        }
+
+        .strength-fill.strong {
+            background: #2ecc71;
+            width: 100%;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .forgot a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .forgot a:hover {
+            color: #764ba2;
+        }
+
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .auth-switch a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .auth-switch a:hover {
+            color: #764ba2;
+        }
+
+        .message {
+            background: #ffebee;
+            border-left: 4px solid #e74c3c;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .message.show {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #toast {
+            z-index: 4000 !important;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                width: 95%;
+                margin: 1rem auto;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .auth-container {
+                padding: 1.5rem;
+            }
+
+            .tab-btn {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="page-header">
+            <h1>Tài Khoản ShoppyDex</h1>
+            <p>Đăng nhập hoặc tạo tài khoản mới</p>
+        </div>
+
+        <div class="auth-container">
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('login')">
+                    <i class="fa-solid fa-sign-in-alt"></i>
+                    Đăng Nhập
+                </button>
+                <button class="tab-btn" onclick="switchTab('register')">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Đăng Ký
+                </button>
+            </div>
+
+            <!-- Login Tab -->
+            <div id="login-tab" class="tab-content active">
+                <div class="message" id="loginMessage">
+                    <span id="loginMessageText"></span>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email hoặc Tên Người Dùng</label>
+                        <input type="text" id="loginUsername" class="form-input" placeholder="Nhập email hoặc tên người dùng" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mật Khẩu</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="loginPassword" class="form-input with-icon" placeholder="Nhập mật khẩu" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPassword')">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="forgot">
+                        <a href="/quen-mat-khau">Quên mật khẩu?</a>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-sign-in-alt"></i>
+                            Đăng Nhập
+                        </button>
+                    </div>
+                </form>
+
+                <div class="auth-switch">
+                    Chưa có tài khoản? <a onclick="switchTab('register')">Đăng ký ngay</a>
+                </div>
+            </div>
+
+            <!-- Register Tab -->
+            <div id="register-tab" class="tab-content">
+                <div class="message" id="registerMessage">
+                    <span id="registerMessageText"></span>
+                </div>
+
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label">Tên Người Dùng</label>
+                        <input type="text" id="registerUsername" class="form-input" placeholder="Chọn tên người dùng" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="registerEmail" class="form-input" placeholder="Nhập email của bạn" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mật Khẩu</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="registerPassword" class="form-input with-icon" placeholder="Tạo mật khẩu mạnh" required oninput="checkPasswordStrength('registerPassword')">
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('registerPassword')">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="registerStrengthFill"></div>
+                        </div>
+                        <div class="password-strength" id="registerStrengthText"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Xác Nhận Mật Khẩu</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="registerConfirmPassword" class="form-input with-icon" placeholder="Nhập lại mật khẩu" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('registerConfirmPassword')">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Đăng Ký
+                        </button>
+                    </div>
+                </form>
+
+                <div class="auth-switch">
+                    Đã có tài khoản? <a onclick="switchTab('login')">Đăng nhập</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-message">Thao tác đã thành công!</span>
+    </div>
+
+    <script src="/js/api-wrapper.js"></script>
+    <script src="/js/toast.js"></script>
+    <script>
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+
+            // Hide error messages
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.remove('show');
+            });
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = event.target.closest('.toggle-password');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+            } else {
+                input.type = 'password';
+                button.innerHTML = '<i class="fa-solid fa-eye"></i>';
+            }
+        }
+
+        function checkPasswordStrength(inputId) {
+            const password = document.getElementById(inputId).value;
+            const strengthFill = document.getElementById('registerStrengthFill');
+            const strengthText = document.getElementById('registerStrengthText');
+
+            if (!password) {
+                strengthFill.className = 'strength-fill';
+                strengthText.textContent = '';
+                return;
+            }
+
+            let strength = 'weak';
+            let score = 0;
+
+            if (password.length >= 8) score++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+            if (/\d/.test(password)) score++;
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
+
+            if (score >= 3) strength = 'strong';
+            else if (score >= 2) strength = 'medium';
+
+            strengthFill.className = 'strength-fill ' + strength;
+
+            const strengthLabels = {
+                weak: '<i class="fa-solid fa-circle-exclamation"></i> Yếu',
+                medium: '<i class="fa-solid fa-circle-check"></i> Trung bình',
+                strong: '<i class="fa-solid fa-circle-check"></i> Mạnh'
+            };
+
+            strengthText.innerHTML = strengthLabels[strength];
+            strengthText.className = 'password-strength ' + strength;
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                showMessage('loginMessage', 'Vui lòng nhập tất cả các trường');
+                return;
+            }
+
+            const loginData = {
+                username: username,
+                password: password
+            };
+
+            AuthenticationAPI.login(loginData).then(response => {
+                if (response.code === 0) {
+                    cookieStore.set('authToken', response.data.token, { path: '/' });    
+                    localStorage.setItem('authToken', response.data.token);
+                    showMessage('loginMessage', 'Đăng nhập thành công! Chuyển hướng đến trang chủ...', false);
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2500);
+                } else {
+                    let errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
+                    if (response.message) errorMsg = response.message;
+                    showMessage('loginMessage', errorMsg);
+                }
+            }).catch(error => {
+                showMessage('loginMessage', 'Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại sau.');
+            });
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+            // Validation
+            if (!username || !email || !password || !confirmPassword) {
+                showMessage('registerMessage', 'Vui lòng nhập tất cả các trường');
+                return;
+            }
+
+            if (password.length < 8) {
+                showMessage('registerMessage', 'Mật khẩu phải có ít nhất 8 ký tự');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('registerMessage', 'Mật khẩu xác nhận không trùng khớp');
+                return;
+            }
+
+            const registerData = {
+                username: username,
+                email: email,
+                password: password
+            };
+
+            AuthenticationAPI.register(registerData).then(response => {
+                if (response.code === 0) {
+                    showMessage('registerMessage', 'Đăng ký thành công! Chuyển hướng đến trang đăng nhập...', false);
+                    setTimeout(() => {
+                        switchTab('login');
+                    }, 2000);
+                } else {
+                    let errorMsg = "Đăng ký thất bại. Vui lòng thử lại.";
+                    if (response.message) errorMsg = response.message;
+                    showMessage('registerMessage', errorMsg);
+                }
+            }).catch(error => {
+                showMessage('registerMessage', 'Đã xảy ra lỗi trong quá trình đăng ký. Vui lòng thử lại sau.');
+            });
+            
+            
+        }
+
+        function showMessage(elementId, message, isError = true) {
+            const messageEl = document.getElementById(elementId);
+            const messageText = document.getElementById(elementId.replace('Message', 'MessageText'));
+            if (isError) {
+                messageEl.style.background = '#ffebee';
+                messageEl.style.borderLeft = '4px solid #e74c3c';
+            } else {
+                messageEl.style.background = '#e8f5e9';
+                messageEl.style.borderLeft = '4px solid #2ecc71';
+            }
+            messageText.textContent = message;
+            messageEl.classList.add('show');
+            
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

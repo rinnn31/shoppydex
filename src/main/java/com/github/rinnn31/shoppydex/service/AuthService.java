@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
 import com.github.rinnn31.shoppydex.exception.UserNotFoundException;
-import com.github.rinnn31.shoppydex.model.api.AuthInfoModel;
+import com.github.rinnn31.shoppydex.model.dto.AuthInfoModel;
 import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 import com.github.rinnn31.shoppydex.model.entity.VerificationInfoEntity;
 import com.github.rinnn31.shoppydex.repository.UserRepository;
@@ -19,11 +19,9 @@ import com.github.rinnn31.shoppydex.security.SPDPasswordEncoder;
 
 @Service
 public class AuthService {
-    private static final String ACTION_VERIFY_EMAIL = "VERIFY_EMAIL";
-
     private static final String ACTION_RESET_PASSWORD = "RESET_PASSWORD";
 
-    private static final int DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES = 2;
+    private static final int DELAY_BETWEEN_VERIFICATION_EMAIL_SECONDS = 30;
 
     @Autowired
     private UserRepository userRepository;
@@ -65,66 +63,39 @@ public class AuthService {
 
         String encodedPassword = passwordEncoder.encode(password);
         UserEntity newUser = new UserEntity(username, email, encodedPassword);
-        newUser.setRole(UserEntity.ROLE_USER);
         userRepository.save(newUser);
     }
 
-    public String sendVerificationEmail(String identifier) {
+    public void sendPasswordResetEmail(String identifier) {
         UserEntity user = userRepository.findByUsernameOrEmail(identifier, identifier).orElseThrow(() -> new UserNotFoundException(identifier));
-        if (user.isVerified()) {
-            throw new SPDException(104, "Email đã được xác minh");
-        }
+
         // Kiểm tra xem có yêu cầu xác minh nào gần đây không, chỉ cho phép gửi lại sau một khoảng thời gian
-        Optional<VerificationInfoEntity> existingVerification = verificationService.getLatestValidVerificationToken(user.getUsername(), ACTION_VERIFY_EMAIL);
-        if (existingVerification.isPresent() && existingVerification.get().getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES))) {
-            LocalDateTime nextAllowedTime = existingVerification.get().getCreatedAt().plusMinutes(DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES);
+        Optional<VerificationInfoEntity> existingVerification = verificationService.getLatestValidVerificationCode(user.getUsername(), ACTION_RESET_PASSWORD);
+        if (existingVerification.isPresent() && existingVerification.get().getCreatedAt().isAfter(LocalDateTime.now().minusSeconds(DELAY_BETWEEN_VERIFICATION_EMAIL_SECONDS))) {
+            LocalDateTime nextAllowedTime = existingVerification.get().getCreatedAt().plusSeconds(DELAY_BETWEEN_VERIFICATION_EMAIL_SECONDS);
             Duration remainingSeconds = Duration.between(LocalDateTime.now(), nextAllowedTime);
             throw new SPDException(102, "Vui lòng chờ " + remainingSeconds.toSeconds() + " giây để gửi lại email xác minh");
         }
 
-        String token = verificationService.createToken(user.getUsername(), ACTION_VERIFY_EMAIL);
+        String code = verificationService.createVerificationSession(user.getUsername(), ACTION_RESET_PASSWORD);
+        
+        
         HashMap<String, String> templateData = new HashMap<>();
         templateData.put("username", user.getUsername());
-        templateData.put("verificationLink", "http://127.0.0.1:8080/auth/verify-email?token=" + token);
-        templateData.put("expirationMinutes", String.valueOf(VerificationService.VERIFICATION_TOKEN_VALID_DURATION_MINUTES));
-        mailService.sendTemplatedEmail(user.getEmail(), 
-                               "Xác minh email tài khoản ShoppyDex", 
-                          "private/mail-template/mail-verify.html", templateData);
-
-        return user.getEmail();
-    }
-
-
-    public String sendPasswordResetEmail(String identifier) {
-        UserEntity user = userRepository.findByUsernameOrEmail(identifier, identifier).orElseThrow(() -> new UserNotFoundException(identifier));
-
-        // Kiểm tra xem có yêu cầu xác minh nào gần đây không, chỉ cho phép gửi lại sau một khoảng thời gian
-        Optional<VerificationInfoEntity> existingVerification = verificationService.getLatestValidVerificationToken(user.getUsername(), ACTION_RESET_PASSWORD);
-        System.out.println(existingVerification);
-        if (existingVerification.isPresent() && existingVerification.get().getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES))) {
-            LocalDateTime nextAllowedTime = existingVerification.get().getCreatedAt().plusMinutes(DELAY_BETWEEN_VERIFICATION_EMAIL_MINUTES);
-            Duration remainingSeconds = Duration.between(LocalDateTime.now(), nextAllowedTime);
-            throw new SPDException(102, "Vui lòng chờ " + remainingSeconds.toSeconds() + " giây để gửi lại email xác minh");
-        }
-
-        String token = verificationService.createToken(user.getUsername(), ACTION_RESET_PASSWORD);
-        HashMap<String, String> templateData = new HashMap<>();
-        templateData.put("username", user.getUsername());
-        templateData.put("resetLink", "http://127.0.0:8080/auth/reset-password?token=" + token);
-        templateData.put("expirationMinutes", String.valueOf(VerificationService.VERIFICATION_TOKEN_VALID_DURATION_MINUTES));
+        templateData.put("verification_code", code);
+        templateData.put("expiry_minutes", String.valueOf(VerificationService.VERIFICATION_CODE_VALID_DURATION_MINUTES));
         mailService.sendTemplatedEmail(user.getEmail(), 
                                "Đặt lại mật khẩu tài khoản ShoppyDex", 
-                          "private/mail-template/mail-reset-password.html", templateData);
+                          "static/template/reset-mail.html", templateData);
         
-        return user.getEmail();
     }
 
-    public void resetPassword(String username, String token, String newPassword) {
+    public void resetPassword(String username, String code, String newPassword) {
         UserEntity user = userRepository.findByUsernameOrEmail(username, username).orElseThrow(
                 () -> new UserNotFoundException(username));
 
-        if (!verificationService.verifyToken(username, token, ACTION_RESET_PASSWORD)) {
-            throw new SPDException(103, "Token không hợp lệ hoặc đã hết hạn");
+        if (!verificationService.verify(user.getUsername(), code, ACTION_RESET_PASSWORD)) {
+            throw new SPDException(103, "Mã xác minh không hợp lệ hoặc đã hết hạn");
         }
         
         user.setPassword(passwordEncoder.encode(newPassword));

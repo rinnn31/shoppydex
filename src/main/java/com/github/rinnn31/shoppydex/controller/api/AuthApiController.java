@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.rinnn31.shoppydex.model.api.ApiResponse;
-import com.github.rinnn31.shoppydex.model.api.AuthInfoModel;
-import com.github.rinnn31.shoppydex.model.api.LoginModel;
-import com.github.rinnn31.shoppydex.model.api.RegisterModel;
-import com.github.rinnn31.shoppydex.model.api.ResetPasswordModel;
+import com.github.rinnn31.shoppydex.model.dto.ApiResponse;
+import com.github.rinnn31.shoppydex.model.dto.AuthInfoModel;
+import com.github.rinnn31.shoppydex.model.dto.LoginModel;
+import com.github.rinnn31.shoppydex.model.dto.RegisterModel;
+import com.github.rinnn31.shoppydex.model.dto.ResetPasswordModel;
 import com.github.rinnn31.shoppydex.service.AuthService;
-import com.github.rinnn31.shoppydex.utils.StringHelper;
 
 import jakarta.validation.Valid;
 
@@ -41,29 +40,16 @@ public class AuthApiController {
         return ApiResponse.success("Đăng ký tài khoản thành công");
     }
 
-    @GetMapping("/send-mail-verification")
-    public ApiResponse<?> sendVerification(@RequestParam("username") String username) {
-        String email = authService.sendVerificationEmail(username);
-        if (username.equals(email)) {
-            return ApiResponse.success("Yêu cầu xác minh đã được gửi đến " + email);
-        } else {
-            return ApiResponse.success("Yêu cầu xác minh đã được gửi đến "+ StringHelper.encodeEmail(email));
-        }
-    }
 
-    @GetMapping("/send-mail-reset-password")
+    @GetMapping("/send-reset-code")
     public ApiResponse<?> sendResetPassword(@RequestParam("username") String username) {
-        String email = authService.sendPasswordResetEmail(username);
-        if (username.equals(email)) {
-            return ApiResponse.success("Yêu cầu đặt lại mật khẩu đã được gửi đến " + email);
-        } else {
-            return ApiResponse.success("Yêu cầu đặt lại mật khẩu đã được gửi đến "+ StringHelper.encodeEmail(email));
-        }
+        authService.sendPasswordResetEmail(username);
+        return ApiResponse.success(null);
     }
 
     @PostMapping("/reset-password")
     public ApiResponse<?> resetPassword(@Valid @RequestBody ResetPasswordModel resetPasswordDTO) {
-        authService.resetPassword(resetPasswordDTO.getUsername(), resetPasswordDTO.getNewPassword(), resetPasswordDTO.getToken());
+        authService.resetPassword(resetPasswordDTO.getUsername(), resetPasswordDTO.getCode(), resetPasswordDTO.getNewPassword());
         return ApiResponse.success("Đặt lại mật khẩu thành công");
     }
 

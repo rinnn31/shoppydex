@@ -11,12 +11,14 @@ import com.github.rinnn31.shoppydex.model.entity.VerificationInfoEntity;
 
 @Repository
 public interface VerificationRepository extends JpaRepository<VerificationInfoEntity, Long> {
-    Optional<VerificationInfoEntity> findByVerificationToken(String verificationToken);
+    Optional<VerificationInfoEntity> findByCode(String code);
 
     @Query("SELECT v FROM VerificationInfo v WHERE v.username = :username AND v.action = :action AND v.expiredAt > CURRENT_TIMESTAMP ORDER BY v.createdAt DESC LIMIT 1")
     Optional<VerificationInfoEntity> findLatestValidByUserAndAction(String username, String action);
 
     void deleteByExpiredAtBefore(java.time.LocalDateTime dateTime);
+
+    void deleteByUsernameAndAction(String username, String action);
 
     boolean existsByUsernameAndExpiredAtAfter(String username, LocalDateTime dateTime);
 }

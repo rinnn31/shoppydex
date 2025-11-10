@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShoppyDex - Cung cấp key game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        main {
+            margin: 0;
+            padding: 0;
+            color: black;
+            font-family: "Poppins", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            flex: 1;
+        }
+        main h1 {
+            font-size: 8em;
+            margin: 0;
+        }
+        main p {
+            font-size: 1.5em;
+            margin: 10px 0 30px;
+        }
+        main img {
+            width: 280px;
+            margin-bottom: 20px;
+        }
+        main a {
+            text-decoration: none;
+            background: blue;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        main a:hover {
+            background: #fff3e0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header & Navbar -->
+    <header class="site-header">
+        <nav class="main-navbar">
+            
+            <div class="logo">
+                <a href="#">ShoppyDex</a>
+            </div>
+
+            <ul class="nav-links">
+                <li>
+                    <a href="/">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/nap-tien">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Nạp tiền</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/san-pham">
+                        <i class="fa-solid fa-user-tag"></i>
+                        <span>Sản phẩm</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-actions">
+                <div class="btn-info" id="user-point" >
+                    <div>0 </div>
+                    <i class="fa-brands fa-product-hunt"></i>
+                </div>
+
+                <div class="btn-info" id="user-profile">
+                    <i class="fa-solid fa-user"></i>
+                    <div>Đăng nhập</div>
+                </div>
+            </div>
+
+        </nav>
+    </header>
+
+    <main>
+        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png" alt="Unauthorized Access">
+        <p>Ồ bạn không có quyền vào trang này</br>Vui lòng đăng nhập để sử dụng</p>
+        <a href="/">Quay trở lại trang chủ</a>
+    </main>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 ShoppyDex. All rights reserved.</p>
+            <p>Liên hệ: <a href="mailto:support@shopacc.com">support@shoppydex.com</a></p>
+            <p>Hotline: 0123.456.789 | Địa chỉ: PTIT Ha Noi</p>
+        </div>
+    </footer>
+    <script src="/js/api-wrapper.js"></script>
+    <script src="/js/user-nav.js"></script>
+</body>
+</html

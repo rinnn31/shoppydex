@@ -1,11 +1,8 @@
 package com.github.rinnn31.shoppydex.model.entity;
 
-import java.util.List;
-
-import com.github.rinnn31.shoppydex.utils.StringArrayConverter;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,54 +12,50 @@ import jakarta.persistence.SequenceGenerator;
 
 @Entity(name = "Product")
 public class ProductEntity {
-    public static final String TYPE_UNIQUE_ITEMS = "UNIQUE_ITEM";
-    public static final String TYPE_MULTI_ITEMS = "MULTI_ITEM";
-
     @Id
-    @Column(name = "ProductID")
+    @Column(name = "ProductId")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="category_seq_gen")
     @SequenceGenerator(name="category_seq_gen", sequenceName="category_seq", allocationSize=1, initialValue=1000000)
-    private Long productId;
+    private long productId;
 
     @Column(name = "Name", nullable = false)
     private String name;
 
     @Column(name = "Description")
+    @Lob
     private String description;
 
-    @Column(name = "Price")
-    private Double price;
+    @Column(name = "Price", nullable = false)
+    private int price;
 
     @Column(name = "Stock", nullable = false)
-    private Integer stock = 0;
+    private int stock;
 
     @Column(name = "Category", nullable = false)
     private String category;
 
-    @Column(name = "ProductType", nullable = false)
-    private String productType;
-
     // Lưu trữ danh sách đường dẫn hình ảnh, cách nhau bằng dấu phẩy
-    @Column(name = "Images")
-    @Lob
-    @Convert(converter = StringArrayConverter.class)
-    private List<String> images;
+    @Column(name = "Image")
+    private String image;
+
+    @Column(name = "CreatedAt", nullable = false)
+    private LocalDateTime createAt;
 
     public ProductEntity() {
         // Default constructor for JPA
     }
 
-    public ProductEntity(String name, String category, String productType) {
+    public ProductEntity(String name, String category, int price) {
         this.name = name;
         this.description = null;
-        this.price = null;
+        this.price = price;
         this.category = category;
-        this.productType = productType;
         this.stock = 0;
-        this.images = null;
+        this.image = null;
+        this.createAt = LocalDateTime.now();
     }
 
-    public Long getProductId() {
+    public long getProductId() {
         return productId;
     }
 
@@ -74,11 +67,11 @@ public class ProductEntity {
         return description;
     }
 
-    public Double getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public Integer getStock() {
+    public int getStock() {
         return stock;
     }
 
@@ -90,11 +83,11 @@ public class ProductEntity {
         this.description = description;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
-    public void setStock(Integer stock) {
+    public void setStock(int stock) {
         this.stock = stock;
     }
 
@@ -106,23 +99,19 @@ public class ProductEntity {
         this.category = category;
     }
 
-    public String getProductType() {
-        return productType;
+    public String getImage() {
+        return image;
     }
 
-    public void setProductType(String productItemType) {
-        if (TYPE_UNIQUE_ITEMS.equals(productItemType) || TYPE_MULTI_ITEMS.equals(productItemType)) {
-            this.productType = productItemType;
-        } else {
-            throw new IllegalArgumentException("Invalid product type: " + productItemType);
-        }
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public List<String> getImages() {
-        return images;
+    public LocalDateTime getCreateAt() {
+        return createAt;
     }
 
-    public void setImages(List<String> images) {
-        this.images = images;
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
     }
 }

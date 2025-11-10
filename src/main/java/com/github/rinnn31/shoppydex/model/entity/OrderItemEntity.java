@@ -1,6 +1,6 @@
 package com.github.rinnn31.shoppydex.model.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.github.rinnn31.shoppydex.utils.StringArrayConverter;
@@ -25,10 +25,10 @@ public class OrderItemEntity {
     @Column(name= "OrderId", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="order_seq_gen")
     @SequenceGenerator(name="order_seq_gen", sequenceName="order_seq", allocationSize=1, initialValue=5000000)
-    private Long orderId;
+    private long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserId", nullable = false, referencedColumnName = "UserID")
+    @JoinColumn(name = "UserId", nullable = false, referencedColumnName = "UserId")
     private UserEntity user;
 
     @Lob
@@ -36,29 +36,37 @@ public class OrderItemEntity {
     @Convert(converter = StringArrayConverter.class)
     private List<String> values;
 
-    @Column(name = "Description", nullable = false)
-    private String description;
+    @Column(name = "ProductId", nullable = false)
+    private long productId;
 
-    @Column(name = "TotalPrice", nullable = false)
-    private Double totalPrice;
+    @Column(name = "ProductName", nullable = false)
+    private String productName;
+
+    @Column(name = "UnitPrice", nullable = false)
+    private int unitPrice;
+
+    @Column(name = "Count", nullable = false)
+    private int count;
 
     @Column(name = "OrderDate", nullable = false)
-    private Date orderDate;
+    private LocalDateTime orderDate;
 
     public OrderItemEntity() {
         // Default constructor for JPA
     }
 
-    public OrderItemEntity(Long orderId, UserEntity owner, List<String> values, String description, Integer quantity, double totalPrice, Date orderDate) {
+    public OrderItemEntity(Long orderId, UserEntity owner, List<String> values, long productId, String productName, int unitPrice, int count, LocalDateTime orderDate) {
         this.orderId = orderId;
         this.user = owner;
         this.values = values;   
-        this.description = description;
-        this.totalPrice = totalPrice;
+        this.productId = productId;
+        this.unitPrice = unitPrice;
+        this.productName = productName;
+        this.count = count;
         this.orderDate = orderDate;
     }
 
-    public Long getOrderId() {
+    public long getOrderId() {
         return orderId;
     }
 
@@ -82,27 +90,43 @@ public class OrderItemEntity {
         this.values = values;
     }
 
-    public String getDescription() {
-        return description;
+    public long getProductId() {
+        return productId;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
-    public double getTotalPrice() {
-        return totalPrice;
+    public int getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setUnitPrice(int unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
-    public Date getOrderDate() {
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public LocalDateTime getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(Date orderDate) {
+    public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
     }
 

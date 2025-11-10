@@ -1,0 +1,88 @@
+/* --- Toast Message Styling (Sáng, Độ Tương Phản Cao) --- */
+
+.toast {
+    visibility: hidden; /* Mặc định ẩn */
+    min-width: 280px;
+    
+    /* MÀU SẮC SÁNG */
+    background-color: #FFFFFF; /* Nền trắng sáng */
+    color: #333333; /* Màu chữ đậm cho độ tương phản cao */
+    
+    text-align: left; /* Căn lề trái */
+    border-radius: 10px; /* Bo góc nhẹ */
+    padding: 18px 25px;
+    position: fixed; 
+    z-index: 4000;
+    
+    /* Định vị ở giữa và phía trên */
+    left: 50%; 
+    top: 0; 
+    transform: translateX(-50%); 
+    
+    font-size: 1rem;
+    font-weight: 500;
+    
+    /* Shadow và Border (Tương tự theme ShopAcc) */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e0e0e0;
+    
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Style khi hiển thị */
+.toast.show {
+    visibility: visible;
+    /* Hiệu ứng: Fade-in và Slide-down */
+    -webkit-animation: fadein-top 0.5s, slidein-top 0.5s, fadeout-top 0.5s 2.5s;
+    animation: fadein-top 0.5s, slidein-top 0.5s, fadeout-top 0.5s 2.5s;
+}
+
+/* Icon Styling (Cập nhật để hiển thị các trạng thái) */
+.toast .fa-solid {
+    font-size: 1.3rem;
+    min-width: 20px; /* Đảm bảo icon không bị nhảy khi đổi */
+}
+
+/* Cập nhật màu mặc định của Icon (Thành công) */
+.toast .fa-circle-check {
+    color: #4CAF50; /* Xanh lá cây mạnh mẽ */
+}
+.toast .fa-triangle-exclamation {
+    color: #FFC107; /* Vàng đậm cho cảnh báo */
+}
+.toast .fa-circle-xmark {
+    color: #F44336; /* Đỏ cho lỗi */
+}
+
+/* --- Keyframes (Giữ nguyên, vì hiệu ứng trượt vẫn hoạt động tốt) --- */
+
+@-webkit-keyframes slidein-top {
+    from {top: -70px; opacity: 0;} 
+    to {top: 30px; opacity: 1;} 
+}
+
+@keyframes slidein-top {
+    from {top: -70px; opacity: 0;}
+    to {top: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout-top {
+    from {top: 30px; opacity: 1;} 
+    to {top: -70px; opacity: 0;} 
+}
+
+@keyframes fadeout-top {
+    from {top: 30px; opacity: 1;}
+    to {top: -70px; opacity: 0;}
+}
+
+@-webkit-keyframes fadein-top {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+@keyframes fadein-top {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
 import com.github.rinnn31.shoppydex.exception.UserNotFoundException;
-import com.github.rinnn31.shoppydex.model.api.UserInfoModel;
+import com.github.rinnn31.shoppydex.model.dto.UserInfoModel;
 import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 import com.github.rinnn31.shoppydex.repository.UserRepository;
 import com.github.rinnn31.shoppydex.security.SPDPasswordEncoder;
@@ -37,15 +37,24 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void setUserPoints(String username, Double points) {
+    public void setUserPoints(String username, Integer points) {
         UserEntity user = getUser(username);
         user.setPoints(points);
         userRepository.save(user);
     }
 
-    public void addUserPoints(String username, Double pointsToAdd) {
+    public void addUserPoints(String username, Integer pointsToAdd) {
         UserEntity user = getUser(username);
         user.setPoints(user.getPoints() + pointsToAdd);
+        userRepository.save(user);
+    }
+
+    public void changeEmail(String username, String newEmail, String password) {
+        UserEntity user = getUser(username);
+        if (!passwordEncoder.matches(password,  user.getPassword())) {
+            throw new SPDException(101, "Mật khẩu không đúng");
+        }
+        user.setEmail(newEmail);
         userRepository.save(user);
     }
 }

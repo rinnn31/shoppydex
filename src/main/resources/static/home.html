@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShoppyDex - Cung cấp key game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Image Slider */
+        .images-container {
+            margin-bottom: 3rem;
+        }
+
+        .image-slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slides-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            flex-shrink: 0;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            text-decoration: none;
+        }
+
+        .slider-arrow:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slider-arrow.prev {
+            left: 20px;
+        }
+
+        .slider-arrow.next {
+            right: 20px;
+        }
+
+        .slider-arrow i {
+            font-size: 1.5rem;
+        }
+
+        /* Content Section */
+        .content-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1s ease-out 0.3s both;
+            margin-bottom: 3rem;
+        }
+
+        .content-section h2 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .content-section img {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Introduction Section */
+        .intro-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .intro-section h2 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .intro-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Scroll Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header & Navbar -->
+    <header class="site-header">
+        <nav class="main-navbar">
+            
+            <div class="logo">
+                <a href="#">ShoppyDex</a>
+            </div>
+
+            <ul class="nav-links">
+                <li>
+                    <a href="/" style="background: rgba(255, 255, 255, 0.15);">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/nap-tien">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Nạp tiền</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/san-pham">
+                        <i class="fa-solid fa-user-tag"></i>
+                        <span>Sản phẩm</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-actions">
+                <div class="btn-info" id="user-point" >
+                    <div>0 </div>
+                    <i class="fa-brands fa-product-hunt"></i>
+                </div>
+
+                <div class="btn-info" id="user-profile">
+                    <i class="fa-solid fa-user"></i>
+                    <div>Đăng nhập</div>
+                </div>
+            </div>
+
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="home">
+        
+        <!-- Image Slider -->
+        <div class="images-container">
+            <div class="image-slider-container">
+            
+                <div class="slides-wrapper">
+                    
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&h=400&fit=crop" alt="Gaming Banner 1"/>
+                    </div>
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&h=400&fit=crop" alt="Gaming Banner 2"/>
+                    </div>
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1200&h=400&fit=crop" alt="Gaming Banner 3"/>
+                    </div>
+                </div>
+                
+                <a class="slider-arrow prev" onclick="plusSlides(-1)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <a class="slider-arrow next" onclick="plusSlides(1)">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content-section" id="products">
+            <h2>CUNG CẤP TÀI KHOẢN GAME - KEY PHẦN MỀM CHÍNH HÃNG</h2>
+            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=400&fit=crop" alt="Gaming Products">
+        </div>
+
+        <!-- Introduction Section -->
+        <section class="intro-section fade-in">
+            <h2>Về ShoppyDex</h2>
+            <p style="text-align: center; font-size: 1.1rem; color: #666; margin-bottom: 2rem;">
+                ShoppyDex là nền tảng mua bán tài khoản game và key phần mềm uy tín hàng đầu Việt Nam.
+                Với hơn 5 năm kinh nghiệm, chúng tôi cam kết mang đến cho khách hàng trải nghiệm mua sắm an toàn, nhanh chóng và tiện lợi.
+            </p>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Bảo mật cao</h3>
+                    <p>Mọi giao dịch đều được mã hóa và bảo mật tuyệt đối, đảm bảo an toàn thông tin khách hàng.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Giao dịch nhanh</h3>
+                    <p>Hệ thống tự động xử lý đơn hàng trong vòng 5 phút, giao tài khoản ngay lập tức.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💎</div>
+                    <h3>Chất lượng đảm bảo</h3>
+                    <p>Tất cả tài khoản đều được kiểm tra kỹ lưỡng, cam kết hoàn tiền 100% nếu có vấn đề.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Giá cả hợp lý</h3>
+                    <p>Giá cả cạnh tranh nhất thị trường với nhiều chương trình khuyến mãi hấp dẫn.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎁</div>
+                    <h3>Đa dạng sản phẩm</h3>
+                    <p>Hàng nghìn tài khoản game như Minecraft, Roblox cho đến các key bản quyền Office,...</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤝</div>
+                    <h3>Hỗ trợ 24/7</h3>
+                    <p>Đội ngũ tư vấn nhiệt tình, sẵn sàng hỗ trợ bạn mọi lúc mọi nơi.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 ShoppyDex. All rights reserved.</p>
+            <p>Liên hệ: <a href="mailto:support@shopacc.com">support@shoppydex.com</a></p>
+            <p>Hotline: 0123.456.789 | Địa chỉ: PTIT Ha Noi</p>
+        </div>
+    </footer>
+
+    <script src="/js/api-wrapper.js"></script>
+    <script src="/js/user-nav.js"></script>
+    <script>
+        // Image Slider
+        const slidesWrapper = document.querySelector('.slides-wrapper');
+        const totalSlides = slidesWrapper.children.length;
+        slidesWrapper.style.width = `${totalSlides * 100}%`;
+        slidesWrapper.querySelectorAll('.slide').forEach(slide => {
+            slide.style.width = `${100 / totalSlides}%`;
+        });
+        let sliceIndex = 1;
+
+        function plusSlides(n) {
+            showSlides(sliceIndex += n);
+        }
+
+        function showSlides(n) {
+            if (n > totalSlides) { sliceIndex = 1; }
+            if (n < 1) { sliceIndex = totalSlides; }
+            const offset = -(sliceIndex - 1) * (100 / totalSlides);
+            slidesWrapper.style.transform = `translateX(${offset}%)`;
+        }
+
+        // Auto slide
+        setInterval(() => {
+            plusSlides(1);
+        }, 5000);
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Fade-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(element => {
+            observer.observe(element);
+        });
+
+        // Add active class to current nav item
+        const sections = document.querySelectorAll('section[id], main[id], div[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.style.background = '';
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.style.background = 'rgba(255, 255, 255, 0.15)';
+                }
+            });
+        });
+    </script>
+</body>
+</html

@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.github.rinnn31.shoppydex.model.entity.OrderItemEntity;
+import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 
 @Repository
 public interface OrderRepository extends JpaRepository<OrderItemEntity, Long> { 
-    Optional<List<OrderItemEntity>> findAllByUser_UserId(Long userId);
+    Optional<List<OrderItemEntity>> findAllByUserOrderByOrderDateDesc(UserEntity user);
+
+    void deleteAllByUser(UserEntity user);
 }

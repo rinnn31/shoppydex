@@ -12,14 +12,14 @@ import com.github.rinnn31.shoppydex.repository.VerificationRepository;
 
 @Service
 public class VerificationService {
-    public static final int VERIFICATION_TOKEN_VALID_DURATION_MINUTES = 30;
+    public static final int VERIFICATION_CODE_VALID_DURATION_MINUTES = 30;
 
     @Autowired
     private VerificationRepository verificationRepository;
 
-
-    public boolean verifyToken(String username, String token, String action) {
-        Optional<VerificationInfoEntity> value = verificationRepository.findByVerificationToken(token);
+    public boolean verify(String username, String code, String action) {
+        Optional<VerificationInfoEntity> value = verificationRepository.findByCode(code);
+        System.out.println("Verification code found: " + value.isPresent());
         if (value.isEmpty()) {
             return false;
         }
@@ -33,19 +33,20 @@ public class VerificationService {
         return true;
     }
 
-    
-    public String createToken(String username, String action) {
-        VerificationInfoEntity verificationInfo = new VerificationInfoEntity(username, action, VERIFICATION_TOKEN_VALID_DURATION_MINUTES);
+    @Transactional
+    public String createVerificationSession(String username, String action) {
+        // Xoá các mã xác thực cũ cùng loại của người dùng này
+        verificationRepository.deleteByUsernameAndAction(username, action);
+        VerificationInfoEntity verificationInfo = new VerificationInfoEntity(username, action, VERIFICATION_CODE_VALID_DURATION_MINUTES);
         verificationRepository.save(verificationInfo);
-        return verificationInfo.getVerificationToken();
+        return verificationInfo.getCode();
     }
 
-    @Transactional
     public void deleteExpiredVerifications() {
         verificationRepository.deleteByExpiredAtBefore(LocalDateTime.now());
     }
 
-    public Optional<VerificationInfoEntity> getLatestValidVerificationToken(String username, String action) {
+    public Optional<VerificationInfoEntity> getLatestValidVerificationCode(String username, String action) {
         return verificationRepository.findLatestValidByUserAndAction(username, action);
     }
 }
