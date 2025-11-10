@@ -7,12 +7,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.github.rinnn31.shoppydex.model.User;
+import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 
 public class SecurityUserDetail implements UserDetails  {
-    private final User user;
+    private final UserEntity user;
 
-    public SecurityUserDetail(User user) {
+    public SecurityUserDetail(UserEntity user) {
         this.user = user;
     }
 

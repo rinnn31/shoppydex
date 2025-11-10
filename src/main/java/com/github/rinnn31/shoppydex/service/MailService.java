@@ -1,6 +1,7 @@
 package com.github.rinnn31.shoppydex.service;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,13 +11,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class MailService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MailService.class);
     
     @Autowired
     private JavaMailSender mailSender;
@@ -24,7 +26,8 @@ public class MailService {
     @Value("${sender.email.address}")
     private String senderAddress;
 
-    public boolean sendEmail(String to, String subject, String body) {
+    @Async
+    public CompletableFuture<Boolean> sendEmail(String to, String subject, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(senderAddress);
@@ -32,14 +35,15 @@ public class MailService {
             message.setSubject(subject);
             message.setText(body);
             mailSender.send(message);
-            return true;
+            return CompletableFuture.completedFuture(true);
         } catch (Exception e) {
-            LOGGER.error(String.format("Failed to send email to %s", to), e);
-            return false;
+            logger.error(String.format("Failed to send email to %s", to), e);
+            return CompletableFuture.completedFuture(false);
         }
     }
 
-    public boolean sendTemplatedEmail(String to, String subject, String templatePath, Map<String, String> attributes) {
+    @Async
+    public CompletableFuture<Boolean> sendTemplatedEmail(String to, String subject, String templatePath, Map<String, String> attributes) {
         ClassPathResource templateResource = new ClassPathResource(templatePath);
         try {
             String template = new String(templateResource.getInputStream().readAllBytes());
@@ -55,10 +59,10 @@ public class MailService {
             helper.setSubject(subject);
             helper.setText(template, true);
             mailSender.send(mimeMessage);
-            return true;
+            return CompletableFuture.completedFuture(true);
         } catch (Exception e) {
-            LOGGER.error(String.format("Failed to send email to %s", to), e);
-            return false;
+            logger.error(String.format("Failed to send email to %s", to), e);
+            return CompletableFuture.completedFuture(false);
         }
     }
 }

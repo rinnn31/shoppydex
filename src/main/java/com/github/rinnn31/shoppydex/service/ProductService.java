@@ -1,211 +1,180 @@
 package com.github.rinnn31.shoppydex.service;
 
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
-import com.github.rinnn31.shoppydex.model.Category;
-import com.github.rinnn31.shoppydex.model.Product;
-import com.github.rinnn31.shoppydex.model.api.CategoryDTO;
-import com.github.rinnn31.shoppydex.model.api.ProductDTO;
-import com.github.rinnn31.shoppydex.repository.CategoryRepository;
+import com.github.rinnn31.shoppydex.model.dto.ProductModel;
+import com.github.rinnn31.shoppydex.model.dto.ProductsPageModel;
+import com.github.rinnn31.shoppydex.model.entity.ProductEntity;
 import com.github.rinnn31.shoppydex.repository.ProductRepository;
-import com.github.rinnn31.shoppydex.utils.WebImageResolver;
-
-
 
 @Service
 public class ProductService {
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
+
+    @Value("${app.products.images.dir}")
+    private String uploadsDir;
+
     @Autowired
     private ProductRepository productRepository;
-    public void deleteProductsByCategory(Long categoryId){
-        if (!categoryRepository.existsById(categoryId)) {
-            throw new SPDException(101, "Danh muc khong ton tai");
-        } 
-        
-        productRepository.deleteByCategoryId(categoryId);
-        categoryRepository.updateStock(categoryId,0);
 
-    }
-    public void deleteCategory(Long categoryId){
-        categoryRepository.deleteById(categoryId);
-        productRepository.deleteByCategoryId(categoryId);
-    }
-    public void deleteProduct(Long productId){
-        Optional<Product> product = productRepository.findById(productId);
-        if(product.isEmpty()){
-            throw new SPDException(101, "Khong ton tai san pham");
-        }
-        if(product.get().getCategory().getProductType().equals("MULTI_ITEM")){
-            throw new SPDException(102, "Khong the xoa san pham MULTI_ITEM");
-        }
-        // if("MULTI_ITEM".equals(product.get().getCategory().getProductType()));
-        
-        productRepository.delete(product.get());
-        Category category = product.get().getCategory();
-        category.setStock(category.getStock()-1);
-        categoryRepository.save(category);
-    }
     @Autowired
-    private CategoryRepository categoryRepository;
+    private ProductItemService productItemService;
 
-    public boolean categoryExisted(Long categoryId) {
-        return categoryRepository.existsById(categoryId);
+    public ProductEntity getProductById(Long productId) {
+        return productRepository.findById(productId).orElseThrow(
+            () -> new SPDException(101, "Sản phẩm không tồn tại!")
+        );
     }
 
-    public boolean productExisted(Long productId) {
-        return productRepository.existsById(productId);
+    public void deleteAllProducts(String category) {
+        List<ProductEntity> products = productRepository.findByCategory(category);
+        for (ProductEntity product : products) {
+            productItemService.deleteAllItems(String.valueOf(product.getProductId()));
+        }
+        productRepository.deleteAll(products);
     }
-
-    public boolean isMultiItemCategory(Long productId) {
-        // Ví dụ: giả sử Product có trường "category.type"
-        return productRepository.findById(productId)
-                .map(product -> product.getCategory().getType().equals("MULTI_ITEM"))
-                .orElse(false);
-    }
-
-    // Cập nhật lại số lượng tồn của danh mục sau khi xóa sản phẩm
     
-    public void deleteCategoryById(Long categoryId) {
-        categoryRepository.deleteById(categoryId);
+    public List<String> getAllCategories() {
+        return productRepository.findDistinctCategories();
     }
 
-    public void deleteProductById(Long productId) {
-        productRepository.deleteById(productId);
-    }
-
-    
-    public ProductService() {
-    }
-
-    // THÊM DANH MỤC MỚI
-    public boolean isCategoryNameTaken(String name) {
-        return categoryRepository.existsByName(name);
-    }
-
-    public boolean existsByName(String name) {
-        return categoryRepository.existsByName(name);
-    } 
-    
-
-    // Xử lý điều kiện trùng tên danh mục-> Trả về mã lỗi 101:
-    // Tạo ngoại lệ nếu trùng tên danh mục thì ngăn chặn việc thêm mới danh mục và trả về thông báo lỗi phù hợp
-    //  "Tên danh mục đã tồn tại" và mã lỗi 101
-    public void addCategory(CategoryDTO categoryDTO) {
-        // kiểm tra trùng tên danh mục
-        if (existsByName(categoryDTO.getName())) {
-            throw new SPDException(101, "Tên danh mục đã tồn tại!");
+    public void addProduct(ProductModel productModel) {
+        if (productRepository.existsByName(productModel.getName())) {
+            throw new SPDException(101, "Tên sản phẩm đã tồn tại!");
         }
 
-        // Chuyển đổi categoryImage từ chuỗi base64 sang file và lưu đường dẫn vào entity
         String imagePath = null;
-        if (categoryDTO.getCategoryImage() != null && !categoryDTO.getCategoryImage().isBlank()) {
-            imagePath = WebImageResolver.pushImage(
-                categoryDTO.getName() + "-" + UUID.randomUUID() + ".png",
-                categoryDTO.getCategoryImage()
-            );
-
-
+        if (productModel.getImage() != null) {
+            imagePath = storeProductImage(productModel.getImage());
         }
 
-        // Thằng repository cần dùng entity, nên đổi từ categoryDTO sang Category
-        Category category = new Category();
-        category.setName(categoryDTO.getName());
-        category.setDescription(categoryDTO.getDescription());
-        category.setType(categoryDTO.getType());
-        category.setProductType(categoryDTO.getProductType());
-        category.setPrice(categoryDTO.getPrice());
-        category.setStock(categoryDTO.getStock());
-        category.setCategoryImage(imagePath);
-        categoryRepository.save(category);
+        ProductEntity newProduct = new ProductEntity();
+        newProduct.setName(productModel.getName());
+        newProduct.setDescription(productModel.getDescription());
+        newProduct.setPrice(productModel.getPrice());
+        newProduct.setCategory(productModel.getCategory());
+        newProduct.setImage(imagePath);
+        newProduct.setCreateAt(LocalDateTime.now());
+        productRepository.save(newProduct);
     }
 
-    // LẤY DANH SÁCH LOẠI DANH MỤC THEO LOẠI (nếu type= null thì trả về danh sách trống)
-    public List<CategoryDTO> getCategoryDTOByType(String type) {
-        if( !StringUtils.hasText(type)){
-            return categoryRepository.findAll().stream().map(CategoryDTO::new).collect(Collectors.toList());
-        }
-        else{
-            List<Category> categoriesByType = categoryRepository.findByType(type);
-            return categoriesByType.stream().map(CategoryDTO::new).collect(Collectors.toList());// return danh sách CategoryDTO được lọc theo type
-        }   
-    }
-
-    // LẤY DANH SÁCH LOẠI DANH MỤC
-    public List<String> getAllCategoryTypes() {
-        return categoryRepository.findDistinctByType();
-    }
-
-    // THÊM SẢN PHẨM MỚI`
-    public void addProduct(ProductDTO request) {
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new SPDException(101, "Danh mục không tồn tại"));
-
-        String productType = category.getProductType();
-
-        if ("UNIQUE_ITEM".equals(productType)) {
-            if (productRepository.existsByName(request.getName())) {
-                throw new SPDException(101, "Tên sản phẩm đã tồn tại!");
-            }
-
-            String imagePath = null;
-            if (request.getProductImages() != null && !request.getProductImages().isEmpty()) {
-                String filename = request.getName() + "-" + UUID.randomUUID();
-                imagePath = WebImageResolver.pushImage(filename, request.getProductImages().get(0));
-            }
-
-            Product product = new Product();
-            product.setName(request.getName());
-            product.setDescription(request.getDescription());
-            product.setValue(request.getValue());
-            product.setPrice(request.getPrice());
-            product.setStock(1);
-            product.setImages(imagePath);
-            product.setExtras(request.getExtras());
-            product.setCategory(category);
-
-            productRepository.save(product);
-
-            category.setStock(category.getStock() + 1);
-            categoryRepository.save(category);
-
-        } else if ("MULTI_ITEM".equals(productType)) {
-            int stockToAdd = (request.getStock() == null || request.getStock() <= 0) ? 1 : request.getStock();
-
-
-            Product product = new Product();
-            product.setValue(request.getValue());
-
-            productRepository.save(product);
-            category.setStock(category.getStock() + 1);
-            categoryRepository.save(category);
-        }
-    }
-
-    // LẤY DANH SÁCH SẢN PHẨM THEO CATEGORY
-    public List<ProductDTO> getProductsByCategoryId(Long categoryId) {
-        if (!categoryRepository.existsById(categoryId)) {
-            throw new SPDException(101, "Id danh mục không tồn tại!");
-        }
-
-        Category category = categoryRepository.findById(categoryId).orElseThrow();
+    public void deleteProduct(Long productId) {
+        ProductEntity product = getProductById(productId);
+        deleteProductImage(product.getImage());
+        productRepository.deleteById(productId);
+        productItemService.deleteAllItems(String.valueOf(productId));
         
-        if (!"UNIQUE_ITEM".equals(category.getProductType())) {
-            throw new SPDException(102, "Nếu category của sản phẩm thuộc loại MULTI_ITEM thì trả về");
-        }
-
-        List<Product> products = productRepository.findAll().stream()
-                .filter(p -> p.getCategory().getCategoryId().equals(categoryId))
-                .toList();
-
-        return products.stream().map(ProductDTO::new).collect(Collectors.toList());
     }
 
-}
+    public ProductsPageModel getProducts(List<String> categories, int page, int size) {
+        Page<ProductEntity> products;
+        Pageable pageable = (Pageable)PageRequest.of(page, size);
+        if (categories != null && !categories.isEmpty()) {
+            products = productRepository.findByCategoryIn(categories, pageable);
+        } else {
+            products = productRepository.findAll(pageable);
+        }
+        return new ProductsPageModel(products.map(ProductModel::new));
+    }
+
+    public ProductModel getProduct(Long productId) {
+        ProductEntity product = getProductById(productId);
+        return new ProductModel(product);
+    }
+
+    public void updateProduct(ProductModel productModel) {
+        ProductEntity existingProduct = getProductById(productModel.getProductId());
+        if (productModel.getName() != null) {
+            if (!existingProduct.getName().equals(productModel.getName()) && productRepository.existsByName(productModel.getName())) {
+                throw new SPDException(102, "Tên sản phẩm đã tồn tại!");
+            }
+            existingProduct.setName(productModel.getName());
+        }
+        if (productModel.getDescription() != null) {
+            existingProduct.setDescription(productModel.getDescription());
+        }
+        if (productModel.getPrice() != null) {
+            existingProduct.setPrice(productModel.getPrice());
+        }
+        if (productModel.getCategory() != null) {
+            existingProduct.setCategory(productModel.getCategory());
+        }
+        if (productModel.getImage() != null) {
+            deleteProductImage(existingProduct.getImage());
+            String newImagePath = storeProductImage(productModel.getImage());
+            existingProduct.setImage(newImagePath);
+        }
+        
+        productRepository.save(existingProduct);
+    }
+
+    public void addItemsToProduct(Long productId, List<String> items) {
+        ProductEntity product = getProductById(productId);
+        product.setStock(product.getStock() + items.size());
+        productRepository.save(product);
+
+        productItemService.appendItems(String.valueOf(productId), items);
+    }
+
+    public void clearItemsFromProduct(Long productId) {
+        ProductEntity product = getProductById(productId);
+        product.setStock(0);
+        productRepository.save(product);
+
+        productItemService.deleteAllItems(String.valueOf(productId));
+    }
+
+    public List<String> takeItemsFromProduct(Long productId, Integer quantity) {
+        ProductEntity product = getProductById(productId);
+        if (product.getStock() < quantity) {
+            throw new SPDException(103, "Không đủ số lượng sản phẩm trong kho!");
+        }
+
+        product.setStock(product.getStock() - quantity);
+        productRepository.save(product);
+        return productItemService.takeItems(String.valueOf(productId), quantity);
+    }
+    
+    private String storeProductImage(String encodedImage) {
+        String imageId = UUID.randomUUID().toString();
+
+        Path imagePath = Paths.get(uploadsDir, imageId + ".png");
+        try {
+            byte[] imageBytes = Base64.getDecoder().decode(encodedImage);
+            Files.write(imagePath, imageBytes);
+            return imagePath.toString();
+        } catch (IOException e) {
+            logger.error("Lỗi khi lưu hình ảnh sản phẩm: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private void deleteProductImage(String imagePath) {
+        if (imagePath == null || imagePath.isEmpty()) {
+            return;
+        }
+        Path path = Paths.get(imagePath);
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            logger.error("Lỗi khi xóa hình ảnh sản phẩm: {}", e.getMessage());
+        }
+    }
+} 

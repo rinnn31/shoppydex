@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách đơn hàng đã mua - ShoppyDex</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/toast.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            /* Flexbox for Sticky Footer */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 36px;
+            color: #6b5eb8;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #777;
+            font-size: 16px;
+        }
+
+        /* Loading Screen */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6b5eb8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: white;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        /* Sidebar Filter */
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            height: fit-content;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Table */
+        .table-section {
+            flex: 1;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .table-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+
+        .table-wrapper thead {
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .table-wrapper thead th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .table-wrapper tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s ease;
+        }
+
+        .table-wrapper tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .table-wrapper tbody td {
+            padding: 12px;
+            color: #333;
+        }
+
+        .code-cell {
+            color: #6b5eb8;
+            font-weight: 600;
+        }
+
+        .message-icon {
+            color: #6b5eb8;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .message-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .status-badge {
+            background-color: #6b5eb8;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Pagination */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            color: #6b5eb8;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #6b5eb8;
+            color: white;
+            border-color: #6b5eb8;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-input {
+            width: 50px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .page-input:focus {
+            outline: none;
+            border-color: #6b5eb8;
+        }
+        
+        .page-input:focus {
+            outline: none;
+            border-color: #6b5eb8;
+        }
+
+        /* View Button */
+        .view-btn {
+            background: linear-gradient(135deg, #6b5eb8 0%, #8b7cd9 100%);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            transition: transform 0.2s ease;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #6b5eb8;
+        }
+
+        .values-textarea {
+            width: 100%;
+            min-height: 250px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            resize: vertical;
+            border-color: #ddd;
+        }
+
+        .values-textarea:focus {
+            outline: none;
+            border-color: #6b5eb8;
+            box-shadow: 0 0 0 3px rgba(107, 94, 184, 0.1);
+        }
+
+        .modal-btn-copy {
+            background-color: #f0f0f5;
+            color: #6b5eb8;
+            border: 1px solid #ddd;
+        }
+
+        .modal-btn-copy:hover {
+            background-color: #e8e8f0;
+        }
+
+        .modal-btn-close {
+            background: linear-gradient(135deg, #6b5eb8 0%, #8b7cd9 100%);
+            color: white;
+        }
+
+        .modal-btn-close:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="main-navbar">
+            <div class="logo">
+                <a href="/">ShoppyDex</a>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="/">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/nap-tien">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Nạp tiền</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/san-pham">
+                        <i class="fa-solid fa-user-tag"></i>
+                        <span>Sản phẩm</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="user-actions">
+                <div class="btn-info" id="user-point" >
+                    <div>0 </div>
+                    <i class="fa-brands fa-product-hunt"></i>
+                </div>
+
+                <div class="btn-info" id="user-profile">
+                    <i class="fa-solid fa-user"></i>
+                    <div>Đăng nhập</div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div style="text-align: center;">
+            <div class="spinner"></div>
+            <div class="loading-text">Đang tải dữ liệu...</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-title">
+            <h1>Danh Sách Đơn Hàng</h1>
+            <div class="page-subtitle">Quản lý các đơn hàng của bạn</div>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Table -->
+            <div class="table-section">
+                <div class="table-wrapper">
+                    <table id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 130px;">Mã đơn hàng</th>
+                                <th style="width: 160px;">Ngày mua</th>
+                                <th style="width: 260px;">Chi tiết sản phẩm</th>
+                                <th style="width: 100px;">Số lượng</th>
+                                <th style="width: 150px;">Đơn giá</th>
+                                <th style="width: 170px;">Tổng tiền</th>
+                                <th style="width: 100px;">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersBody">
+                        </tbody>
+                    </table>
+                    <div id="noData" class="no-data" style="display: none;">
+                        Không có dữ liệu
+                    </div>
+                    <div class="pagination-wrapper">
+                        <div class="pagination-info">
+                            Hiển thị <span id="pageInfo">0</span> trên <span id="totalInfo">0</span> đơn hàng
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" id="prevBtn">← Trước</button>
+                            <span style="color: #666; font-size: 14px; font-weight: 600;">
+                                Trang <input type="number" id="pageInput" class="page-input" min="1" value="1"> 
+                                <span id="totalPages">1</span>
+                            </span>
+                            <button class="pagination-btn" id="nextBtn">Sau →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="valuesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Chi tiết sản phẩm - <span id="modalOrderId"></span></h2>
+                <button class="close-btn" onclick="closeValuesPopup()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea class="values-textarea" id="valuesText" readonly></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-copy" onclick="copyToClipboard()">Sao chép</button>
+                <button class="modal-btn modal-btn-close" onclick="closeValuesPopup()">Đóng</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check"></i> 
+        <span id="toast-message">Thao tác đã thành công!</span>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 ShopAcc. All rights reserved.</p>
+            <p>Liên hệ: <a href="mailto:support@shoppydex.com">support@shoppydex.com</a></p>
+            <p>Hotline: 0123.456.789 | Địa chỉ: PTIT Ha Noi</p>
+        </div>
+    </footer>
+
+    <script src="/js/api-wrapper.js"></script>
+    <script src="/js/user-nav.js"></script>
+    <script src="/js/toast.js"></script>
+    <script>
+        let allOrders = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+
+        // Fetch orders
+        async function fetchOrders() {
+            showLoading(true);
+            try {
+
+                let res = await OrderAPI.getUserOrders();
+                if (res.code !== 0) {
+                    throw new Error(res.message);
+                }
+
+                allOrders = res.data
+                console.log('Fetched orders:', allOrders);
+                currentPage = 1;
+                renderTable();
+                updatePagination();
+                showLoading(false);
+            } catch (error) {
+                console.error('Error:', error);
+                showLoading(false);
+            }
+        }
+
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('ordersBody');
+            const noData = document.getElementById('noData');
+            tbody.innerHTML = '';
+
+            if (allOrders.length === 0) {
+                noData.style.display = 'block';
+                return;
+            }
+
+            noData.style.display = 'none';
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageOrders = allOrders.slice(start, end);
+
+            pageOrders.forEach((order, index) => {
+                const row = `
+                    <tr>
+                        <td class="code-cell">${order.orderId}</td>
+                        <td>${formatDate(new Date(order.orderDate))}</td>
+                        <td><a href="/san-pham-chi-tiet?id=${order.productId}">${order.productName}</a></td>
+                        <td>${order.count}</td>
+                        <td>${order.unitPrice}</td>
+                        <td>${(order.unitPrice * order.count)}</td>
+                        <td><button class="view-btn" onclick="showValuesPopup(${start + index})">Xem</button></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(allOrders.length / itemsPerPage);
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, allOrders.length);
+
+            document.getElementById('pageInfo').textContent = allOrders.length === 0 ? 0 : end;
+            document.getElementById('totalInfo').textContent = allOrders.length;
+            document.getElementById('totalPages').textContent = totalPages;
+            document.getElementById('pageInput').value = currentPage;
+            document.getElementById('pageInput').max = totalPages;
+
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
+
+            document.getElementById('prevBtn').onclick = previousPage;
+            document.getElementById('nextBtn').onclick = nextPage;
+            document.getElementById('pageInput').onkeypress = handlePageInputEnter;
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(allOrders.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+                updatePagination();
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+                updatePagination();
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+            }
+        }
+
+        function handlePageInputEnter(event) {
+            if (event.key === 'Enter') {
+                const page = parseInt(event.target.value);
+                const totalPages = Math.ceil(allOrders.length / itemsPerPage);
+                if (page >= 1 && page <= totalPages) {
+                    currentPage = page;
+                    renderTable();
+                    updatePagination();
+                    window.scrollTo({ top: 300, behavior: 'smooth' });
+                } else {
+                    alert(`Vui lòng nhập trang từ 1 đến ${totalPages}`);
+                    event.target.value = currentPage;
+                }
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
+        }
+
+        function showValuesPopup(orderIndex) {
+            try {
+                const orderId = allOrders[orderIndex].orderId;
+                const values = allOrders[orderIndex].values;
+                const valuesText = values.join('\n');
+                
+                document.getElementById('modalOrderId').textContent = orderId;
+                document.getElementById('valuesText').value = valuesText;
+                document.getElementById('valuesModal').classList.add('active');
+            } catch (error) {
+                showToast('Lỗi khi tải chi tiết sản phẩm', 'fa-triangle-exclamation', '#e74c3c');
+                console.error(error);
+            }
+        }
+
+        function closeValuesPopup() {
+            document.getElementById('valuesModal').classList.remove('active');
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('valuesText');
+            textarea.select();
+            document.execCommand('copy');
+            showToast('Đã sao chép vào clipboard', 'fa-circle-check', '#2ecc71');
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('valuesModal');
+            if (event.target === modal) {
+                closeValuesPopup();
+            }
+        });
+
+        // Initialize
+        fetchOrders();
+    </script>
+</body>
+</html>

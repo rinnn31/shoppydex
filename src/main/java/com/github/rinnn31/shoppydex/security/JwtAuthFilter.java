@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -27,21 +28,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
-        final String authHeader = request.getHeader("Authorization");
-
-        if (!StringUtils.hasText(authHeader) || !authHeader.startsWith("Bearer ")) {
+        final String token = parseJwtToken(request);
+        if (token == null || !StringUtils.hasText(token)) {
             filterChain.doFilter(request, response);
             return;
         }
-
+        
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            final String jwt = authHeader.substring(7);
-            final String username = jwtTojenService.validateTokenAndGetUsername(jwt);
+            final String username = jwtTojenService.validateTokenAndGetUsername(token);
             UserDetails userDetails = null;
             if (username != null &&
                 (userDetails = userDetailsService.loadUserByUsername(username)) != null &&
-                jwt.equals(((SecurityUserDetail)userDetails).getActualActiveToken())) {
+                token.equals(((SecurityUserDetail)userDetails).getActualActiveToken())) {
 
                UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
@@ -54,5 +52,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             
         }
         filterChain.doFilter(request, response);
+    }
+
+    private String parseJwtToken(HttpServletRequest request) {
+        final String authHeader = request.getHeader("Authorization");
+        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("authToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 }

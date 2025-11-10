@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.rinnn31.shoppydex.model.api.ApiResponse;
-import com.github.rinnn31.shoppydex.model.api.ChangePasswordDTO;
-import com.github.rinnn31.shoppydex.model.api.ResetPasswordDTO;
+import com.github.rinnn31.shoppydex.model.dto.ApiResponse;
+import com.github.rinnn31.shoppydex.model.dto.ChangeEmailModel;
+import com.github.rinnn31.shoppydex.model.dto.ChangePasswordModel;
 import com.github.rinnn31.shoppydex.service.UserService;
 
 import jakarta.validation.Valid;
@@ -28,31 +28,17 @@ public class UserApiController {
         return ApiResponse.success(userService.getUserInfo(username));
     }
 
-    @GetMapping("/send-mail-verification")
-    public ApiResponse<?> sendVerification() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        userService.sendVerificationEmail(username);
-        return ApiResponse.success("Yêu cầu xác minh đã được gửi");
-    }
-
-    @GetMapping("/send-mail-reset-password")
-    public ApiResponse<?> sendResetPassword() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        userService.sendPasswordResetEmail(username);
-        return ApiResponse.success("Yêu cầu đặt lại mật khẩu đã được gửi");
-    }
-
     @PostMapping("/change-password") 
-    public ApiResponse<?> resetPassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ApiResponse<?> resetPassword(@Valid @RequestBody ChangePasswordModel changePasswordDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        userService.userUpdatePassword(username, changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword());
+        userService.updatePassword(username, changePasswordDTO.getCurrentPassword(), changePasswordDTO.getNewPassword());
         return ApiResponse.success("Đổi mật khẩu thành công");
     }
 
-    @PostMapping("/reset-password")
-    public ApiResponse<?> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+    @PostMapping("/change-email")
+    public ApiResponse<?> changeEmail(@Valid @RequestBody ChangeEmailModel changeEmailDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        userService.adminUpdatePassword(username, resetPasswordDTO.getNewPassword(), resetPasswordDTO.getToken());
-        return ApiResponse.success("Đặt lại mật khẩu thành công");
+        userService.changeEmail(username, changeEmailDTO.getNewEmail(), changeEmailDTO.getPassword());
+        return ApiResponse.success("Đổi email thành công");
     }
 }

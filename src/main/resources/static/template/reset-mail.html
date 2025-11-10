@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Đặt lại mật khẩu</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; }
+      .code-box { font-size: 26px !important; letter-spacing: 6px !important; }
+      .btn { width: 100% !important; display: block !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#f2f4f6; font-family: Arial, sans-serif;">
+  <!-- Preheader (ẩn) -->
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; line-height:1px; color:#fff; opacity:0;">
+    Sử dụng mã bên dưới để đặt lại mật khẩu của bạn. Mã có hiệu lực trong {{expiry_minutes}} phút.
+  </div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding:30px 16px;">
+        <table class="container" width="600" cellpadding="0" cellspacing="0" role="presentation" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:24px; text-align:center; background: linear-gradient(90deg,#4f46e5,#06b6d4); color:#ffffff;">
+              <h1 style="margin:0; font-size:20px; font-weight:600;">Đặt lại mật khẩu</h1>
+              <p style="margin:6px 0 0; font-size:13px; opacity:0.95;">Mã xác thực chỉ dùng một lần</p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px; color:#374151; font-size:15px; line-height:1.6;">
+              <p>Xin chào <strong>{{username}}</strong>,</p>
+
+              <p>Bạn vừa yêu cầu đặt lại mật khẩu cho tài khoản của mình.  
+              Vui lòng sử dụng mã xác thực bên dưới để hoàn tất quá trình.  
+              Mã này có hiệu lực trong <strong>{{expiry_minutes}} phút</strong>.</p>
+
+              <!-- Code box -->
+              <div style="text-align:center; margin:24px 0;">
+                <div class="code-box" style="display:inline-block; padding:18px 28px; border-radius:10px; background:#f9fafb; border:1px solid #e5e7eb; font-size:32px; letter-spacing:8px; font-weight:700; color:#111827;">
+                  {{verification_code}}
+                </div>
+              </div>
+
+
+
+              <hr style="border:none; border-top:1px solid #e5e7eb; margin:24px 0;">
+
+              <p style="font-size:14px; color:#6b7280;">
+                Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này hoặc 
+                <a href="mailto:{{support_email}}" style="color:#4f46e5; text-decoration:none;">liên hệ bộ phận hỗ trợ</a> của chúng tôi để được giúp đỡ.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:18px 24px; text-align:center; font-size:12px; color:#9ca3af; background-color:#fbfdff;">
+              <div>© <span id="year">2025</span> SHoppyDex. Mọi quyền được bảo lưu.</div>
+            </td>
+          </tr>
+        </table>
+        
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
