@@ -6,13 +6,13 @@ import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 import com.github.rinnn31.shoppydex.model.enums.UserRole;
 import com.github.rinnn31.shoppydex.repository.UserRepository;
-import com.github.rinnn31.shoppydex.security.SPDPasswordEncoder;
 
 @Component
 public class DataInitializer implements ApplicationRunner {
@@ -21,7 +21,7 @@ public class DataInitializer implements ApplicationRunner {
     private UserRepository userRepository;
 
     @Autowired
-    private SPDPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public void run(org.springframework.boot.ApplicationArguments args) throws Exception {
@@ -36,7 +36,6 @@ public class DataInitializer implements ApplicationRunner {
             adminUser.setUsername("admin");
             adminUser.setPassword(passwordEncoder.encode("admin123"));
             adminUser.setRole(UserRole.ADMIN);
-            adminUser.setVerified(true);
             adminUser.setPoints(1000000);
             adminUser.setEmail("damquangphongthdk@gmail.com");
             userRepository.save(adminUser);

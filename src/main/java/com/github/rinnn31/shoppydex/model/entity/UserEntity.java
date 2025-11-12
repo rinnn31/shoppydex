@@ -34,9 +34,6 @@ public class UserEntity {
     @Column(name = "Points", nullable = false)
     private int points;
 
-    @Column(name = "IsVerified", nullable = false)
-    private boolean IsVerified;
-
     @Column(name = "ActiveToken")
     private String activeToken;
 
@@ -53,7 +50,6 @@ public class UserEntity {
         this.password = password;
         this.role = UserRole.USER.name();
         this.points = 0;
-        this.IsVerified = false;
         this.activeToken = null;
     }
 
@@ -99,14 +95,6 @@ public class UserEntity {
 
     public void setPoints(int points) {
         this.points = points;
-    }
-
-    public boolean isVerified() {
-        return IsVerified;
-    }
-
-    public void setVerified(boolean isVerified) {
-        IsVerified = isVerified;
     }
 
     public String getActiveToken() {

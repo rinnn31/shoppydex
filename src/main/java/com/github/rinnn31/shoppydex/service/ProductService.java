@@ -101,12 +101,14 @@ public class ProductService {
 
     public void updateProduct(ProductModel productModel) {
         ProductEntity existingProduct = getProductById(productModel.getProductId());
+
         if (productModel.getName() != null) {
             if (!existingProduct.getName().equals(productModel.getName()) && productRepository.existsByName(productModel.getName())) {
                 throw new SPDException(102, "Tên sản phẩm đã tồn tại!");
             }
             existingProduct.setName(productModel.getName());
         }
+
         if (productModel.getDescription() != null) {
             existingProduct.setDescription(productModel.getDescription());
         }
@@ -116,6 +118,7 @@ public class ProductService {
         if (productModel.getCategory() != null) {
             existingProduct.setCategory(productModel.getCategory());
         }
+        
         if (productModel.getImage() != null) {
             deleteProductImage(existingProduct.getImage());
             String newImagePath = storeProductImage(productModel.getImage());

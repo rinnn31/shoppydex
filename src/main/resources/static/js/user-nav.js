@@ -1,5 +1,5 @@
 window.onload = async function() {
-    let info = await getUserInfo();
+    let info = await getUserInfo(true);
 
     const userProfile = this.document.getElementById('user-profile');
     const userPoint = this.document.getElementById('user-point');
@@ -59,7 +59,11 @@ async function getUserInfo(force = false) {
         let res = await UserAPI.getProfile();
         if (res && res.code === 0) {
             sessionStorage.setItem('userInfo', JSON.stringify(res.data));
+            return res.data;
+        } else {
+            sessionStorage.removeItem('userInfo');
+            return null;
         }
     }
-    return sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')) : null;
+    return JSON.parse(sessionStorage.getItem('userInfo'));
 }

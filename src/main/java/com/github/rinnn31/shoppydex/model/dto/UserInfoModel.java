@@ -29,7 +29,6 @@ public class UserInfoModel {
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.points = user.getPoints();
-        this.isVerified = user.isVerified();
         this.isAdmin = user.getRole().equals(UserRole.ADMIN.name());
     }
 
@@ -59,10 +58,6 @@ public class UserInfoModel {
 
     public void setPoints(Integer points) {
         this.points = points;
-    }
-
-    public void setVerified(Boolean isVerified) {
-        this.isVerified = isVerified;
     }
 
     public Boolean getIsAdmin() {

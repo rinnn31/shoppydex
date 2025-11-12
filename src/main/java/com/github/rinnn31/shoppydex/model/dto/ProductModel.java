@@ -11,7 +11,7 @@ public class ProductModel {
     private Long productId;
 
     @NotBlank(message = "Tên sản phẩm không được để trống")
-    private  String name;
+    private String name;
 
     private String description;
     

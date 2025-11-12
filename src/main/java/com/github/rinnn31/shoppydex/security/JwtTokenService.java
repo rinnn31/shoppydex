@@ -17,11 +17,13 @@ public class JwtTokenService {
         byte[] keyBytes = SECRET_KEY.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }
+    
     public String generateToken(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 7_200_000))
+                // Token hợp lệ trong 2 giờ = 7_200_000 milliseconds
+                .expiration(new Date(System.currentTimeMillis() + 7_200_000)) 
                 .signWith(getSigningKey())
                 .compact();
     }

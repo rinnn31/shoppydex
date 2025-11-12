@@ -1,6 +1,7 @@
 package com.github.rinnn31.shoppydex.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
@@ -8,7 +9,6 @@ import com.github.rinnn31.shoppydex.exception.UserNotFoundException;
 import com.github.rinnn31.shoppydex.model.dto.UserInfoModel;
 import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 import com.github.rinnn31.shoppydex.repository.UserRepository;
-import com.github.rinnn31.shoppydex.security.SPDPasswordEncoder;
 
 @Service
 public class UserService {
@@ -16,7 +16,7 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private SPDPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     public UserEntity getUser(String username) {
         return userRepository.findByUsername(username)

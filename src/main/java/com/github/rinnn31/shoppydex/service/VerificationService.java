@@ -18,15 +18,14 @@ public class VerificationService {
     private VerificationRepository verificationRepository;
 
     public boolean verify(String username, String code, String action) {
-        Optional<VerificationInfoEntity> value = verificationRepository.findByCode(code);
-        System.out.println("Verification code found: " + value.isPresent());
+        Optional<VerificationInfoEntity> value = verificationRepository.findByUsernameAndAction(username, action);
         if (value.isEmpty()) {
             return false;
         }
+
         VerificationInfoEntity verificationInfo = value.get();
         // Token chỉ hợp lệ nếu thuộc về đúng người dùng, đúng hành động và chưa hết hạn
-        if (!verificationInfo.getAction().equals(action) || !verificationInfo.getUsername().equals(username) ||
-            verificationInfo.getExpiredAt().isBefore(LocalDateTime.now())) {
+        if (!verificationInfo.getCode().equals(code) ||verificationInfo.getExpiredAt().isBefore(LocalDateTime.now())) {
             return false;
         }
         verificationRepository.delete(verificationInfo);

@@ -37,6 +37,7 @@ public class OrderService {
         }
 
         List<String> purchasedItems = productService.takeItemsFromProduct(productId, quantity);
+        
         userService.addUserPoints(username, -(product.getPrice() * quantity));
 
         OrderItemEntity order = new OrderItemEntity();

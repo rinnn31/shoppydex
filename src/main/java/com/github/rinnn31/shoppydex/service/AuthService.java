@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.github.rinnn31.shoppydex.exception.SPDException;
@@ -15,7 +16,6 @@ import com.github.rinnn31.shoppydex.model.entity.UserEntity;
 import com.github.rinnn31.shoppydex.model.entity.VerificationInfoEntity;
 import com.github.rinnn31.shoppydex.repository.UserRepository;
 import com.github.rinnn31.shoppydex.security.JwtTokenService;
-import com.github.rinnn31.shoppydex.security.SPDPasswordEncoder;
 
 @Service
 public class AuthService {
@@ -30,7 +30,7 @@ public class AuthService {
     private JwtTokenService jwtTokenService;
 
     @Autowired
-    private SPDPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private VerificationService verificationService;
@@ -68,17 +68,21 @@ public class AuthService {
 
     public void sendPasswordResetEmail(String identifier) {
         UserEntity user = userRepository.findByUsernameOrEmail(identifier, identifier).orElseThrow(() -> new UserNotFoundException(identifier));
-
         // Kiểm tra xem có yêu cầu xác minh nào gần đây không, chỉ cho phép gửi lại sau một khoảng thời gian
         Optional<VerificationInfoEntity> existingVerification = verificationService.getLatestValidVerificationCode(user.getUsername(), ACTION_RESET_PASSWORD);
-        if (existingVerification.isPresent() && existingVerification.get().getCreatedAt().isAfter(LocalDateTime.now().minusSeconds(DELAY_BETWEEN_VERIFICATION_EMAIL_SECONDS))) {
-            LocalDateTime nextAllowedTime = existingVerification.get().getCreatedAt().plusSeconds(DELAY_BETWEEN_VERIFICATION_EMAIL_SECONDS);
-            Duration remainingSeconds = Duration.between(LocalDateTime.now(), nextAllowedTime);
-            throw new SPDException(102, "Vui lòng chờ " + remainingSeconds.toSeconds() + " giây để gửi lại email xác minh");
+        
+        
+        if (existingVerification.isPresent()) {
+            // tính khoảng thời gian chênh lệch giữa 2 mốc thời gian
+            long delta = Duration.between(existingVerification.get().getCreatedAt(), LocalDateTime.now()).toSeconds();
+            // Nếu khoảng thời gian chênh lệch nhỏ hơn thời gian chờ định nghĩa, ném ngoại lệ
+            if (delta < DELAY_BETWEEN_VERIFICATION_EMAIL_SECONDS) {
+                long remainingSeconds = DELAY_BETWEEN_VERIFICATION_EMAIL_SECONDS - delta;
+                throw new SPDException(102, String.format("Vui lòng chờ %d giây trước khi yêu cầu gửi lại email xác minh", remainingSeconds));
+            }
         }
 
         String code = verificationService.createVerificationSession(user.getUsername(), ACTION_RESET_PASSWORD);
-        
         
         HashMap<String, String> templateData = new HashMap<>();
         templateData.put("username", user.getUsername());
